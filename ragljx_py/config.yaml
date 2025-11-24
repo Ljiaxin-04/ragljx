@@ -1,0 +1,50 @@
+# gRPC 服务配置
+grpc:
+  host: "0.0.0.0"
+  port: 50051
+
+# PostgreSQL 数据库配置
+database:
+  host: "localhost"
+  port: 5432
+  database: "ragljx"
+  username: "ragljx"
+  password: "ragljx_password"
+
+# Qdrant 向量数据库配置
+qdrant:
+  host: "localhost"
+  port: 6333
+  collection_prefix: "rag_collection"
+
+# OpenAI 配置
+openai:
+  api_key: ""  # 从环境变量读取
+  api_base: "https://api.openai.com/v1"
+  embedding_model: "text-embedding-3-small"
+  embedding_dimensions: 1536
+  chat_model: "gpt-4"
+  temperature: 0.7
+  max_tokens: 2000
+
+# MinIO 配置（用于获取文件）
+minio:
+  endpoint: "localhost:9000"
+  access_key: "minioadmin"
+  secret_key: "minioadmin"
+  secure: false
+  bucket: "ragljx"
+
+# RAG 配置
+rag:
+  chunk_size: 512
+  chunk_overlap: 50
+  top_k: 5
+  similarity_threshold: 0.7
+  similarity_weight: 0.5
+
+# 日志配置
+logging:
+  level: "INFO"
+  format: "<green>{time:YYYY-MM-DD HH:mm:ss}</green> | <level>{level: <8}</level> | <cyan>{name}</cyan>:<cyan>{function}</cyan>:<cyan>{line}</cyan> - <level>{message}</level>"
+

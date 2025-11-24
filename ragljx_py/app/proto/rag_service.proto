@@ -1,0 +1,124 @@
+syntax = "proto3";
+
+package rag;
+
+option go_package = "ragljx/proto/rag";
+
+// RAG 服务定义
+service RAGService {
+  // 解析文档
+  rpc ParseDocument(ParseDocumentRequest) returns (ParseDocumentResponse);
+  
+  // 向量化文档
+  rpc VectorizeDocument(VectorizeDocumentRequest) returns (VectorizeDocumentResponse);
+  
+  // 删除文档向量
+  rpc DeleteDocumentVectors(DeleteDocumentVectorsRequest) returns (DeleteDocumentVectorsResponse);
+  
+  // RAG 对话
+  rpc Chat(ChatRequest) returns (ChatResponse);
+  
+  // RAG 对话（流式）
+  rpc ChatStream(ChatRequest) returns (stream ChatStreamResponse);
+  
+  // 检索相关文档
+  rpc RetrieveDocuments(RetrieveDocumentsRequest) returns (RetrieveDocumentsResponse);
+}
+
+// 解析文档请求
+message ParseDocumentRequest {
+  string document_id = 1;
+  string object_key = 2;
+  bytes file_content = 3;
+  string mime_type = 4;
+}
+
+// 解析文档响应
+message ParseDocumentResponse {
+  bool success = 1;
+  string content = 2;
+  string error_message = 3;
+}
+
+// 向量化文档请求
+message VectorizeDocumentRequest {
+  string document_id = 1;
+  string content = 2;
+  string knowledge_base_id = 3;
+  string collection_name = 4;
+  string title = 5;
+  string object_key = 6;
+}
+
+// 向量化文档响应
+message VectorizeDocumentResponse {
+  bool success = 1;
+  string error_message = 2;
+}
+
+// 删除文档向量请求
+message DeleteDocumentVectorsRequest {
+  repeated string document_ids = 1;
+  string collection_name = 2;
+}
+
+// 删除文档向量响应
+message DeleteDocumentVectorsResponse {
+  bool success = 1;
+  int32 deleted_count = 2;
+  string error_message = 3;
+}
+
+// 对话请求
+message ChatRequest {
+  string query = 1;
+  bool use_rag = 2;
+  repeated string knowledge_base_ids = 3;
+  int32 top_k = 4;
+  float similarity_threshold = 5;
+  float similarity_weight = 6;
+  repeated ChatMessage history = 7;
+}
+
+// 对话消息
+message ChatMessage {
+  string role = 1;  // user, assistant, system
+  string content = 2;
+}
+
+// 对话响应
+message ChatResponse {
+  string content = 1;
+  repeated RAGSource sources = 2;
+  int32 tokens_used = 3;
+}
+
+// 流式对话响应
+message ChatStreamResponse {
+  string type = 1;  // start, content, sources, done
+  string delta = 2;
+  repeated RAGSource sources = 3;
+  int32 tokens_used = 4;
+}
+
+// RAG 来源
+message RAGSource {
+  string document_id = 1;
+  string title = 2;
+  float score = 3;
+  string snippet = 4;
+}
+
+// 检索文档请求
+message RetrieveDocumentsRequest {
+  string query = 1;
+  repeated string knowledge_base_ids = 2;
+  int32 top_k = 3;
+  float similarity_threshold = 4;
+}
+
+// 检索文档响应
+message RetrieveDocumentsResponse {
+  repeated RAGSource documents = 1;
+}
+
