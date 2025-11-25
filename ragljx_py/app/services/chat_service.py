@@ -157,8 +157,15 @@ class ChatService:
                 
                 if retrieved_docs:
                     rag_context = self.build_rag_context(retrieved_docs)
-                    system_prompt += f"\n\n{rag_context}\n\n请基于以上参考资料回答用户的问题。如果参考资料中没有相关信息，请明确告知用户。"
-                    
+                    system_prompt += (
+                        f"\n\n{rag_context}\n\n"
+                        "回答要求：\n"
+                        "1. 明确说明本回答主要依据哪些参考资料，例如："
+                        "‘根据知识库文档《标题1》《标题2》等资料，……’。\n"
+                        "2. 如果参考资料中没有相关信息，请直接说明“在已知资料中未找到相关内容”，"
+                        "再根据常识谨慎回答或提示用户补充资料。\n"
+                    )
+
                     # 保存 RAG 来源
                     rag_sources = [
                         {
@@ -247,8 +254,15 @@ class ChatService:
                 
                 if retrieved_docs:
                     rag_context = self.build_rag_context(retrieved_docs)
-                    system_prompt += f"\n\n{rag_context}\n\n请基于以上参考资料回答用户的问题。如果参考资料中没有相关信息，请明确告知用户。"
-                    
+                    system_prompt += (
+                        f"\n\n{rag_context}\n\n"
+                        "回答要求：\n"
+                        "1. 明确说明本回答主要依据哪些参考资料，例如："
+                        "‘根据知识库文档《标题1》《标题2》等资料，……’。\n"
+                        "2. 如果参考资料中没有相关信息，请直接说明“在已知资料中未找到相关内容”，"
+                        "再根据常识谨慎回答或提示用户补充资料。\n"
+                    )
+
                     rag_sources = [
                         {
                             "document_id": doc['document_id'],

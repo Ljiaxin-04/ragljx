@@ -1,0 +1,4 @@
+2025-11-26 00:01:46.086 | INFO     | app.grpc_server.rag_servicer:ChatStream:164 - Chat stream request: B+ 树只在叶子节点存数据吗... use_rag=True
+2025-11-26 00:01:48.390 | INFO     | app.services.vector_service:query:288 - Query collection liangjiaxin_ceshi returned 0 results
+2025-11-26 00:01:48.391 | INFO     | app.services.chat_service:retrieve_documents:57 - No results from liangjiaxin_ceshi with threshold 0.699999988079071, retrying without threshold
+2025-11-26 00:01:49.682 | INFO     | app.services.vector_service:query:288 - Query collection liangjiaxin_ceshi returned 5 results
