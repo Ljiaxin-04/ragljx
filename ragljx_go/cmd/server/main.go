@@ -6,12 +6,10 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
-	"ragljx/internal/middleware"
 	"ragljx/ioc"
 	"ragljx/ioc/config/datasource"
 	httpConfig "ragljx/ioc/config/http"
 	kafkaConfig "ragljx/ioc/config/kafka"
-	logConfig "ragljx/ioc/config/log"
 	minioConfig "ragljx/ioc/config/minio"
 	redisConfig "ragljx/ioc/config/redis"
 	grpcConfig "ragljx/ioc/config/grpc"
@@ -24,8 +22,6 @@ import (
 	_ "ragljx/internal/api/document"
 	_ "ragljx/internal/api/knowledge_base"
 	_ "ragljx/internal/api/user"
-
-	"github.com/gin-gonic/gin"
 )
 
 func main() {
@@ -48,26 +44,11 @@ func main() {
 	_ = minioConfig.Get()
 	_ = grpcConfig.Get()
 
-	// 获取日志和 HTTP 服务
-	logger := logConfig.Get()
+	// 获取 HTTP 服务
 	httpServer := httpConfig.Get()
-
 	if httpServer == nil {
 		log.Fatal("HTTP server not initialized")
 	}
-
-	// 获取 Gin 引擎
-	engine := httpServer.Engine()
-
-	// 注册全局中间件
-	engine.Use(middleware.CORS())
-	engine.Use(middleware.Logger(logger))
-	engine.Use(middleware.Recovery(logger))
-
-	// 健康检查
-	engine.GET("/health", func(c *gin.Context) {
-		c.JSON(200, gin.H{"status": "ok"})
-	})
 
 	// 打印已加载的对象
 	log.Printf("Loaded configs: %v", ioc.Config().List())

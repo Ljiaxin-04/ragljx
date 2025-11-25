@@ -6,6 +6,8 @@ import (
 	"log"
 	"net/http"
 	"ragljx/ioc"
+	"ragljx/internal/middleware"
+	logConfig "ragljx/ioc/config/log"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -42,7 +44,7 @@ func (g *GinServer) Name() string {
 }
 
 func (g *GinServer) Priority() int {
-	return -99
+	return 800
 }
 
 func (g *GinServer) Init() error {
@@ -50,7 +52,22 @@ func (g *GinServer) Init() error {
 	gin.SetMode(gin.ReleaseMode)
 
 	g.engine = gin.New()
+
+	// 注册全局中间件（必须在路由注册之前）
+	g.engine.Use(middleware.CORS())
 	g.engine.Use(gin.Recovery())
+
+	// 获取日志配置并注册日志中间件
+	logger := logConfig.Get()
+	if logger != nil {
+		g.engine.Use(middleware.Logger(logger))
+		g.engine.Use(middleware.Recovery(logger))
+	}
+
+	// 健康检查路由
+	g.engine.GET("/health", func(c *gin.Context) {
+		c.JSON(200, gin.H{"status": "ok"})
+	})
 
 	g.server = &http.Server{
 		Addr:         fmt.Sprintf("%s:%d", g.Host, g.Port),
@@ -92,3 +109,7 @@ func Get() *GinServer {
 	return obj.(*GinServer)
 }
 
+// RootRouter 获取根路由引擎
+func RootRouter() *gin.Engine {
+	return Get().Engine()
+}

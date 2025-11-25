@@ -7,6 +7,7 @@ import (
 	"ragljx/internal/service"
 	"ragljx/ioc"
 	"ragljx/ioc/config/datasource"
+	httpConfig "ragljx/ioc/config/http"
 
 	"github.com/gin-gonic/gin"
 )
@@ -27,6 +28,11 @@ func (k *KnowledgeBaseAPI) Name() string {
 func (k *KnowledgeBaseAPI) Init() error {
 	db := datasource.Get()
 	k.kbService = service.NewKnowledgeBaseService(db)
+
+	// 注册路由
+	engine := httpConfig.RootRouter()
+	k.Registry(engine)
+
 	return nil
 }
 

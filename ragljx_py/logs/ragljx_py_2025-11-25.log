@@ -14,3 +14,8 @@
 2025-11-25 16:05:33.711 | INFO     | __main__:serve:55 - RAG gRPC server started on 0.0.0.0:50051
 2025-11-25 16:06:37.915 | INFO     | __main__:handle_sigterm:59 - Received shutdown signal, stopping server...
 2025-11-25 16:06:37.941 | INFO     | __main__:handle_sigterm:61 - Server stopped
+2025-11-25 16:14:41.030 | INFO     | app.services.vector_service:__init__:46 - VectorService initialized with Qdrant at localhost:6333
+2025-11-25 16:14:41.030 | INFO     | app.services.vector_service:__init__:47 - Using embedding model: text-embedding-3-small
+2025-11-25 16:14:41.077 | INFO     | app.services.chat_service:__init__:22 - ChatService initialized with model: gpt-4
+2025-11-25 16:14:41.077 | INFO     | app.grpc_server.rag_servicer:__init__:17 - RAGServicer initialized
+2025-11-25 16:14:41.081 | INFO     | __main__:serve:55 - RAG gRPC server started on 0.0.0.0:50051

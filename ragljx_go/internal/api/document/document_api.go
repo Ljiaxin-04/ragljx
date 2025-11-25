@@ -7,6 +7,7 @@ import (
 	"ragljx/internal/service"
 	"ragljx/ioc"
 	"ragljx/ioc/config/datasource"
+	httpConfig "ragljx/ioc/config/http"
 	kafkaConfig "ragljx/ioc/config/kafka"
 	minioConfig "ragljx/ioc/config/minio"
 
@@ -36,6 +37,11 @@ func (d *DocumentAPI) Init() error {
 	var kafkaWriter = kafkaObj.Producer("document-tasks")
 
 	d.docService = service.NewDocumentService(db, minioClient, bucketName, kafkaWriter)
+
+	// 注册路由
+	engine := httpConfig.RootRouter()
+	d.Registry(engine)
+
 	return nil
 }
 

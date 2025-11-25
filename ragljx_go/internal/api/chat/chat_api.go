@@ -11,6 +11,7 @@ import (
 	"ragljx/ioc"
 	"ragljx/ioc/config/datasource"
 	grpcConfig "ragljx/ioc/config/grpc"
+	httpConfig "ragljx/ioc/config/http"
 	pb "ragljx/proto/rag"
 
 	"github.com/gin-gonic/gin"
@@ -39,6 +40,10 @@ func (ch *ChatAPI) Init() error {
 	if grpcConn != nil {
 		ch.grpcClient = pb.NewRAGServiceClient(grpcConn)
 	}
+
+	// 注册路由
+	engine := httpConfig.RootRouter()
+	ch.Registry(engine)
 
 	return nil
 }

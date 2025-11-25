@@ -7,6 +7,7 @@ import (
 	"ragljx/internal/service"
 	"ragljx/ioc"
 	"ragljx/ioc/config/datasource"
+	httpConfig "ragljx/ioc/config/http"
 	"strconv"
 
 	"github.com/gin-gonic/gin"
@@ -28,6 +29,11 @@ func (u *UserAPI) Name() string {
 func (u *UserAPI) Init() error {
 	db := datasource.Get()
 	u.userService = service.NewUserService(db)
+
+	// 注册路由
+	engine := httpConfig.RootRouter()
+	u.Registry(engine)
+
 	return nil
 }
 
