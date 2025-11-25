@@ -28,36 +28,51 @@ class ChatService:
         top_k: int = 5,
         similarity_threshold: float = 0.7
     ) -> List[Dict[str, Any]]:
-        """
-        从多个知识库检索相关文档
-        
+        """从多个知识库检索相关文档。
+
         Args:
             query: 查询文本
             kb_collection_names: 知识库集合名称列表
             top_k: 每个知识库返回的结果数
-            similarity_threshold: 相似度阈值
-        
+            similarity_threshold: 相似度阈值（最小相似度）。
+                如果在该阈值下没有检索到结果，会自动放宽阈值再尝试一次。
+
         Returns:
             检索到的文档列表
         """
         all_results = []
-        
+
         for collection_name in kb_collection_names:
             try:
+                # 第一次使用会话配置的相似度阈值检索
                 results = self.vector_service.query(
                     collection_name=collection_name,
                     query_text=query,
                     top_k=top_k,
-                    score_threshold=similarity_threshold
+                    score_threshold=similarity_threshold,
                 )
+
+                # 如果没有结果且设置了阈值，则再尝试一次放宽阈值（不设置阈值，只取前 top_k）
+                if not results and similarity_threshold > 0:
+                    logger.info(
+                        f"No results from {collection_name} with threshold "
+                        f"{similarity_threshold}, retrying without threshold"
+                    )
+                    results = self.vector_service.query(
+                        collection_name=collection_name,
+                        query_text=query,
+                        top_k=top_k,
+                        score_threshold=0.0,
+                    )
+
                 all_results.extend(results)
             except Exception as e:
                 logger.error(f"Error retrieving from {collection_name}: {e}")
                 continue
-        
+
         # 按相似度排序并去重
         all_results.sort(key=lambda x: x['score'], reverse=True)
-        
+
         # 去重（基于 document_id 和 chunk_index）
         seen = set()
         unique_results = []
@@ -66,10 +81,10 @@ class ChatService:
             if key not in seen:
                 seen.add(key)
                 unique_results.append(result)
-        
+
         # 限制总数
         return unique_results[:top_k * 2]  # 返回最多 top_k * 2 个结果
-    
+
     def build_rag_context(self, retrieved_docs: List[Dict[str, Any]]) -> str:
         """
         构建 RAG 上下文
