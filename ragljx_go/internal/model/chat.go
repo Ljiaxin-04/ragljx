@@ -3,6 +3,7 @@ package model
 import (
 	"database/sql/driver"
 	"encoding/json"
+	"strings"
 	"time"
 
 	"github.com/google/uuid"
@@ -76,8 +77,54 @@ func (s *StringArray) Scan(value interface{}) error {
 		*s = []string{}
 		return nil
 	}
-	// PostgreSQL 返回的是字符串格式，需要解析
-	return json.Unmarshal(value.([]byte), s)
+
+	var str string
+	switch v := value.(type) {
+	case []byte:
+		str = string(v)
+	case string:
+		str = v
+	default:
+		// 不支持的类型，直接返回空数组
+		*s = []string{}
+		return nil
+	}
+
+	str = strings.TrimSpace(str)
+	if str == "" || str == "{}" {
+		*s = []string{}
+		return nil
+	}
+
+	// 兼容历史上如果以 JSON 格式存储（如 ["id1","id2"]）
+	if str[0] == '[' {
+		return json.Unmarshal([]byte(str), s)
+	}
+
+	// 解析 PostgreSQL text[] 字面量，例如 {"id1","id2"}
+	if len(str) >= 2 && str[0] == '{' && str[len(str)-1] == '}' {
+		inner := str[1 : len(str)-1]
+		if inner == "" {
+			*s = []string{}
+			return nil
+		}
+		parts := strings.Split(inner, ",")
+		result := make([]string, 0, len(parts))
+		for _, p := range parts {
+			p = strings.TrimSpace(p)
+			if len(p) >= 2 && p[0] == '"' && p[len(p)-1] == '"' {
+				p = p[1 : len(p)-1]
+			}
+			// 这里我们的内容是 UUID，不涉及复杂转义，简单处理即可
+			result = append(result, p)
+		}
+		*s = result
+		return nil
+	}
+
+	// 兜底：当成单个字符串
+	*s = []string{str}
+	return nil
 }
 
 // Value 实现 driver.Valuer 接口
@@ -85,7 +132,15 @@ func (s StringArray) Value() (driver.Value, error) {
 	if len(s) == 0 {
 		return "{}", nil
 	}
-	return json.Marshal(s)
+
+	parts := make([]string, 0, len(s))
+	for _, v := range s {
+		// 简单转义双引号和反斜杠
+		v = strings.ReplaceAll(v, `\`, `\\`)
+		v = strings.ReplaceAll(v, `"`, `\\"`)
+		parts = append(parts, "\""+v+"\"")
+	}
+	return "{" + strings.Join(parts, ",") + "}", nil
 }
 
 // JSONBArray JSONB 数组类型
