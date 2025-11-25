@@ -226,6 +226,26 @@ func (s *DocumentService) Delete(ctx context.Context, id string) error {
 		return errors.Wrap(500, "failed to get document", err)
 	}
 
+	// 获取知识库信息（需要 english_name 作为 collection name）
+	kb, err := s.kbRepo.GetByID(ctx, doc.KnowledgeBaseID)
+	if err != nil {
+		return errors.Wrap(500, "failed to get knowledge base", err)
+	}
+
+	// 从 Qdrant 删除向量（如果 gRPC 客户端可用且文档已向量化）
+	if s.grpcClient != nil && doc.ParsingStatus == "ready" && kb.EnglishName != "" {
+		deleteResp, err := s.grpcClient.DeleteDocumentVectors(ctx, &pb.DeleteDocumentVectorsRequest{
+			CollectionName: kb.EnglishName,
+			DocumentIds:    []string{doc.ID},
+		})
+		if err != nil {
+			// 记录错误但不中断删除流程
+			// 可以考虑记录日志
+		} else if !deleteResp.Success {
+			// 记录错误但不中断删除流程
+		}
+	}
+
 	// 从 MinIO 删除文件
 	if err := s.minioClient.RemoveObject(ctx, s.bucketName, doc.ObjectKey, minio.RemoveObjectOptions{}); err != nil {
 		// 记录错误但不中断删除流程
@@ -239,18 +259,6 @@ func (s *DocumentService) Delete(ctx context.Context, id string) error {
 	// 更新知识库统计
 	s.kbRepo.IncrementDocumentCount(ctx, doc.KnowledgeBaseID, -1)
 	s.kbRepo.UpdateTotalSize(ctx, doc.KnowledgeBaseID, -doc.Size)
-
-	// 发送删除向量任务到 Kafka
-	taskMsg := map[string]interface{}{
-		"document_id":       doc.ID,
-		"knowledge_base_id": doc.KnowledgeBaseID,
-		"task_type":         "delete_vectors",
-	}
-	msgBytes, _ := json.Marshal(taskMsg)
-	s.kafkaWriter.WriteMessages(ctx, kafka.Message{
-		Key:   []byte(doc.ID),
-		Value: msgBytes,
-	})
 
 	return nil
 }

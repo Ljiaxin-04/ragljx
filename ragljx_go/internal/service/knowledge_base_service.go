@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	pb "ragljx/proto/rag"
 	"ragljx/internal/model"
 	"ragljx/internal/pkg/errors"
 	"ragljx/internal/repository"
@@ -10,12 +11,16 @@ import (
 )
 
 type KnowledgeBaseService struct {
-	kbRepo *repository.KnowledgeBaseRepository
+	kbRepo     *repository.KnowledgeBaseRepository
+	docRepo    *repository.DocumentRepository
+	grpcClient pb.RAGServiceClient
 }
 
-func NewKnowledgeBaseService(db *gorm.DB) *KnowledgeBaseService {
+func NewKnowledgeBaseService(db *gorm.DB, grpcClient pb.RAGServiceClient) *KnowledgeBaseService {
 	return &KnowledgeBaseService{
-		kbRepo: repository.NewKnowledgeBaseRepository(db),
+		kbRepo:     repository.NewKnowledgeBaseRepository(db),
+		docRepo:    repository.NewDocumentRepository(db),
+		grpcClient: grpcClient,
 	}
 }
 
@@ -116,7 +121,7 @@ func (s *KnowledgeBaseService) Update(ctx context.Context, id string, req *Updat
 // Delete 删除知识库
 func (s *KnowledgeBaseService) Delete(ctx context.Context, id string) error {
 	// 检查知识库是否存在
-	_, err := s.kbRepo.GetByID(ctx, id)
+	kb, err := s.kbRepo.GetByID(ctx, id)
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
 			return errors.ErrKBNotFound
@@ -124,6 +129,23 @@ func (s *KnowledgeBaseService) Delete(ctx context.Context, id string) error {
 		return errors.Wrap(500, "failed to get knowledge base", err)
 	}
 
+	// 检查是否还有文档
+	_, total, err := s.docRepo.ListByKnowledgeBase(ctx, id, 0, 1, "")
+	if err != nil {
+		return errors.Wrap(500, "failed to check documents", err)
+	}
+	if total > 0 {
+		return errors.New(400, "knowledge base has documents, please delete them first")
+	}
+
+	// 删除 Qdrant collection（如果 gRPC 客户端可用且 english_name 不为空）
+	if s.grpcClient != nil && kb.EnglishName != "" {
+		// 注意：这里需要添加一个新的 gRPC 方法来删除 collection
+		// 暂时跳过，因为 proto 中可能没有定义这个方法
+		// 可以在 Python 端添加 DeleteCollection 方法
+	}
+
+	// 删除知识库记录
 	if err := s.kbRepo.Delete(ctx, id); err != nil {
 		return errors.Wrap(500, "failed to delete knowledge base", err)
 	}

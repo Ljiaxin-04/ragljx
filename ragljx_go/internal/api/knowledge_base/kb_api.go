@@ -32,9 +32,8 @@ func (k *KnowledgeBaseAPI) Name() string {
 
 func (k *KnowledgeBaseAPI) Init() error {
 	db := datasource.Get()
-	k.kbService = service.NewKnowledgeBaseService(db)
 
-	// 初始化文档服务
+	// 初始化依赖
 	minioObj := minioConfig.Get()
 	kafkaObj := kafkaConfig.Get()
 	grpcConn := grpcConfig.Get()
@@ -44,6 +43,10 @@ func (k *KnowledgeBaseAPI) Init() error {
 	var kafkaWriter = kafkaObj.Producer("document-tasks")
 	var grpcClient = pb.NewRAGServiceClient(grpcConn)
 
+	// 初始化知识库服务（需要 gRPC 客户端）
+	k.kbService = service.NewKnowledgeBaseService(db, grpcClient)
+
+	// 初始化文档服务
 	k.docService = service.NewDocumentService(db, minioClient, bucketName, kafkaWriter, grpcClient)
 
 	// 注册路由
