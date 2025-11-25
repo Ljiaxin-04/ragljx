@@ -164,8 +164,16 @@ services:
       RAGLJX_MINIO_SECRET_KEY: minioadmin
       RAGLJX_GRPC_HOST: 0.0.0.0
       RAGLJX_GRPC_PORT: 50051
-      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
-      OPENAI_API_BASE: ${OPENAI_API_BASE:-https://api.openai.com/v1}
+      # 嵌入模型配置
+      EMBEDDING_API_KEY: ${EMBEDDING_API_KEY:-}
+      EMBEDDING_API_BASE: ${EMBEDDING_API_BASE:-https://api.openai.com/v1}
+      EMBEDDING_MODEL: ${EMBEDDING_MODEL:-text-embedding-3-small}
+      # 对话模型配置
+      CHAT_API_KEY: ${CHAT_API_KEY:-}
+      CHAT_API_BASE: ${CHAT_API_BASE:-https://api.openai.com/v1}
+      CHAT_MODEL: ${CHAT_MODEL:-gpt-4}
+      CHAT_TEMPERATURE: ${CHAT_TEMPERATURE:-0.7}
+      CHAT_MAX_TOKENS: ${CHAT_MAX_TOKENS:-2000}
     ports:
       - "50051:50051"
     depends_on:

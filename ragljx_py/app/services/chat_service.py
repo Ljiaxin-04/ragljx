@@ -12,14 +12,14 @@ class ChatService:
     
     def __init__(self, vector_service: VectorService):
         self.vector_service = vector_service
-        
-        # 初始化 OpenAI 客户端
+
+        # 初始化对话模型客户端
         self.client = OpenAI(
-            api_key=config.openai_api_key,
-            base_url=config.openai_api_base
+            api_key=config.chat_api_key,
+            base_url=config.chat_api_base
         )
-        
-        logger.info("ChatService initialized")
+
+        logger.info(f"ChatService initialized with model: {config.chat_model}")
     
     def retrieve_documents(
         self,
@@ -168,12 +168,12 @@ class ChatService:
             # 添加当前查询
             messages.append({"role": "user", "content": query})
             
-            # 调用 OpenAI API
+            # 调用对话模型 API
             response = self.client.chat.completions.create(
-                model=config.openai_chat_model,
+                model=config.chat_model,
                 messages=messages,
-                temperature=temperature or config.openai_temperature,
-                max_tokens=max_tokens or config.openai_max_tokens
+                temperature=temperature or config.chat_temperature,
+                max_tokens=max_tokens or config.chat_max_tokens
             )
             
             # 提取回复
@@ -255,12 +255,12 @@ class ChatService:
             
             messages.append({"role": "user", "content": query})
             
-            # 流式调用 OpenAI API
+            # 流式调用对话模型 API
             stream = self.client.chat.completions.create(
-                model=config.openai_chat_model,
+                model=config.chat_model,
                 messages=messages,
-                temperature=temperature or config.openai_temperature,
-                max_tokens=max_tokens or config.openai_max_tokens,
+                temperature=temperature or config.chat_temperature,
+                max_tokens=max_tokens or config.chat_max_tokens,
                 stream=True
             )
             

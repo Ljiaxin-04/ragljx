@@ -23,27 +23,28 @@ class VectorService:
             host=config.qdrant_host,
             port=config.qdrant_port
         )
-        
-        # 初始化 OpenAI Embedding
+
+        # 初始化嵌入模型
         self.embedding = OpenAIEmbedding(
-            api_key=config.openai_api_key,
-            api_base=config.openai_api_base,
-            model=config.openai_embedding_model,
-            dimensions=config.openai_embedding_dimensions
+            api_key=config.embedding_api_key,
+            api_base=config.embedding_api_base,
+            model=config.embedding_model,
+            dimensions=config.embedding_dimensions
         )
-        
+
         # 配置 LlamaIndex Settings
         Settings.embed_model = self.embedding
         Settings.chunk_size = config.rag_chunk_size
         Settings.chunk_overlap = config.rag_chunk_overlap
-        
+
         # 文本分割器
         self.text_splitter = SentenceSplitter(
             chunk_size=config.rag_chunk_size,
             chunk_overlap=config.rag_chunk_overlap
         )
-        
+
         logger.info(f"VectorService initialized with Qdrant at {config.qdrant_host}:{config.qdrant_port}")
+        logger.info(f"Using embedding model: {config.embedding_model}")
     
     def build_collection_name(self, kb_english_name: str) -> str:
         """
