@@ -157,9 +157,14 @@ class VectorService:
             for i, node in enumerate(nodes):
                 # 生成向量
                 embedding_vector = self.embedding.get_text_embedding(node.get_content())
-                
-                # 构建点
-                point_id = f"{document_id}_{i}"
+
+                # 构建点（使用 UUID 作为 point_id）
+                import uuid
+                import hashlib
+                # 使用 document_id 和 chunk_index 生成确定性的 UUID
+                point_id_str = f"{document_id}_{i}"
+                point_id = str(uuid.UUID(hashlib.md5(point_id_str.encode()).hexdigest()))
+
                 point = PointStruct(
                     id=point_id,
                     vector=embedding_vector,

@@ -2,6 +2,7 @@ package chat
 
 import (
 	"context"
+	"encoding/json"
 	"io"
 	"ragljx/internal/middleware"
 	"ragljx/internal/model"
@@ -328,6 +329,7 @@ func (ch *ChatAPI) ChatStream(c *gin.Context) {
 	fullContent := ""
 	var ragSources []model.RAGSource
 	var tokensUsed int32
+	sourcesSent := false
 
 	for {
 		chunk, err := stream.Recv()
@@ -335,14 +337,20 @@ func (ch *ChatAPI) ChatStream(c *gin.Context) {
 			break
 		}
 		if err != nil {
-			c.SSEvent("error", err.Error())
+			errorData := map[string]interface{}{
+				"type":  "error",
+				"error": err.Error(),
+			}
+			errorJSON, _ := json.Marshal(errorData)
+			c.SSEvent("message", string(errorJSON))
 			break
 		}
 
 		fullContent += chunk.Delta
 		tokensUsed = chunk.TokensUsed
 
-		if len(chunk.Sources) > 0 {
+		// 处理 start 类型（包含 sources）
+		if chunk.Type == "start" && len(chunk.Sources) > 0 && !sourcesSent {
 			for _, src := range chunk.Sources {
 				ragSources = append(ragSources, model.RAGSource{
 					DocumentID: src.DocumentId,
@@ -351,15 +359,37 @@ func (ch *ChatAPI) ChatStream(c *gin.Context) {
 					Content:    src.Snippet,
 				})
 			}
+
+			sourcesData := map[string]interface{}{
+				"type":    "sources",
+				"sources": ragSources,
+			}
+			sourcesJSON, _ := json.Marshal(sourcesData)
+			c.SSEvent("message", string(sourcesJSON))
+			c.Writer.Flush()
+			sourcesSent = true
 		}
 
-		c.SSEvent("message", chunk.Delta)
-		c.Writer.Flush()
+		// 发送内容增量
+		if chunk.Type == "content" && chunk.Delta != "" {
+			contentData := map[string]interface{}{
+				"type":    "content",
+				"content": chunk.Delta,
+			}
+			contentJSON, _ := json.Marshal(contentData)
+			c.SSEvent("message", string(contentJSON))
+			c.Writer.Flush()
+		}
 	}
 
 	// 保存助手消息
 	ch.chatService.SaveMessage(context.Background(), req.SessionID, "assistant", fullContent, ragSources, int(tokensUsed))
 
-	c.SSEvent("done", "")
+	// 发送完成信号
+	doneData := map[string]interface{}{
+		"type": "done",
+	}
+	doneJSON, _ := json.Marshal(doneData)
+	c.SSEvent("message", string(doneJSON))
 }
 

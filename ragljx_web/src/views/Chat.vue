@@ -163,7 +163,11 @@ const createNewSession = async () => {
   try {
     const response = await createChatSession({
       title: '新对话',
-      knowledge_base_ids: []
+      knowledge_base_ids: selectedKnowledgeBases.value,  // 使用当前选择的知识库
+      use_rag: selectedKnowledgeBases.value.length > 0,  // 如果有知识库则启用 RAG
+      top_k: 5,
+      similarity_threshold: 0.7,
+      similarity_weight: 1.5
     })
     const newSession = response.data
     sessions.value.unshift(newSession)
@@ -230,10 +234,9 @@ const sendMessage = async () => {
   isLoading.value = true
 
   try {
-    // 使用流式输出
+    // 使用流式输出（不需要传递 knowledge_base_ids，会话已经包含了）
     const eventSource = sendMessageStream(currentSessionId.value, {
-      question,
-      knowledge_base_ids: selectedKnowledgeBases.value
+      question
     })
 
     let assistantMessage = {
@@ -253,6 +256,10 @@ const sendMessage = async () => {
         scrollToBottom()
       } else if (data.type === 'sources') {
         assistantMessage.sources = data.sources
+      } else if (data.type === 'error') {
+        eventSource.close()
+        isLoading.value = false
+        ElMessage.error('对话失败: ' + (data.error || '未知错误'))
       } else if (data.type === 'done') {
         eventSource.close()
         isLoading.value = false
