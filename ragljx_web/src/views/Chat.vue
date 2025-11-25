@@ -291,7 +291,6 @@ watch(selectedKnowledgeBases, async (newVal) => {
       use_rag: newVal.length > 0
     })
 
-    //             v v        
     const index = sessions.value.findIndex((s) => s.id === currentSessionId.value)
     if (index !== -1) {
       sessions.value[index] = {
