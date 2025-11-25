@@ -20,9 +20,12 @@ export RAGLJX_MINIO_SECRET_KEY=minioadmin
 export RAGLJX_GRPC_HOST=0.0.0.0
 export RAGLJX_GRPC_PORT=50051
 
-# AI 配置（从 .env 文件读取）
+# AI 配置（从 .env 文件读取，并导出为环境变量）
 if [ -f "../.env" ]; then
+    # 自动 export .env 中定义的变量
+    set -a
     source "../.env"
+    set +a
 fi
 
 echo "📋 配置信息："

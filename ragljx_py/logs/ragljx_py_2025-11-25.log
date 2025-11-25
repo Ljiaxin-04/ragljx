@@ -32,3 +32,26 @@
 2025-11-25 21:45:03.664 | ERROR    | app.services.file_parser:parse:104 - Error parsing file: PyMuPDF not installed
 2025-11-25 21:54:06.658 | INFO     | __main__:handle_sigterm:59 - Received shutdown signal, stopping server...
 2025-11-25 21:54:06.679 | INFO     | __main__:handle_sigterm:61 - Server stopped
+2025-11-25 22:07:57.431 | INFO     | app.services.vector_service:__init__:46 - VectorService initialized with Qdrant at localhost:6333
+2025-11-25 22:07:57.431 | INFO     | app.services.vector_service:__init__:47 - Using embedding model: text-embedding-3-small
+2025-11-25 22:07:57.475 | INFO     | app.services.chat_service:__init__:22 - ChatService initialized with model: gpt-4
+2025-11-25 22:07:57.475 | INFO     | app.grpc_server.rag_servicer:__init__:17 - RAGServicer initialized
+2025-11-25 22:07:57.477 | INFO     | __main__:serve:55 - RAG gRPC server started on 0.0.0.0:50051
+2025-11-25 22:08:06.060 | INFO     | __main__:handle_sigterm:59 - Received shutdown signal, stopping server...
+2025-11-25 22:08:06.063 | INFO     | __main__:handle_sigterm:61 - Server stopped
+2025-11-25 22:22:27.581 | INFO     | app.services.vector_service:__init__:46 - VectorService initialized with Qdrant at localhost:6333
+2025-11-25 22:22:27.582 | INFO     | app.services.vector_service:__init__:47 - Using embedding model: text-embedding-3-small
+2025-11-25 22:22:27.639 | INFO     | app.services.chat_service:__init__:22 - ChatService initialized with model: deepseek-chat
+2025-11-25 22:22:27.640 | INFO     | app.grpc_server.rag_servicer:__init__:17 - RAGServicer initialized
+2025-11-25 22:22:27.644 | INFO     | __main__:serve:55 - RAG gRPC server started on 0.0.0.0:50051
+2025-11-25 22:22:35.322 | INFO     | __main__:handle_sigterm:59 - Received shutdown signal, stopping server...
+2025-11-25 22:22:35.326 | INFO     | __main__:handle_sigterm:61 - Server stopped
+2025-11-25 22:25:21.831 | INFO     | app.services.vector_service:__init__:46 - VectorService initialized with Qdrant at localhost:6333
+2025-11-25 22:25:21.831 | INFO     | app.services.vector_service:__init__:47 - Using embedding model: text-embedding-3-small
+2025-11-25 22:25:21.872 | INFO     | app.services.chat_service:__init__:22 - ChatService initialized with model: deepseek-chat
+2025-11-25 22:25:21.872 | INFO     | app.grpc_server.rag_servicer:__init__:17 - RAGServicer initialized
+2025-11-25 22:25:21.876 | INFO     | __main__:serve:55 - RAG gRPC server started on 0.0.0.0:50051
+2025-11-25 22:27:41.448 | INFO     | app.grpc_server.rag_servicer:ParseDocument:22 - Parsing document: bd5d05ce-cf6e-48ff-b7f6-236c739826e0
+2025-11-25 22:27:41.501 | INFO     | app.grpc_server.rag_servicer:VectorizeDocument:48 - Vectorizing document: bd5d05ce-cf6e-48ff-b7f6-236c739826e0 to collection: liangjiaxin_ceshi
+2025-11-25 22:27:41.614 | INFO     | app.services.vector_service:create_collection:90 - Created collection: liangjiaxin_ceshi
+2025-11-25 22:27:51.868 | INFO     | app.services.vector_service:upsert_document:188 - Upserted document bd5d05ce-cf6e-48ff-b7f6-236c739826e0 with 5 chunks to liangjiaxin_ceshi
