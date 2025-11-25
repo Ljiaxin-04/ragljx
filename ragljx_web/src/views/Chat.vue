@@ -405,6 +405,8 @@ onMounted(() => {
   height: calc(100vh - 120px);
   background: white;
   border-radius: 8px;
+  overflow: hidden; /* 防止内容超出卡片区域 */
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
 }
 
 .session-sidebar {
@@ -526,10 +528,19 @@ onMounted(() => {
 
 .message-content {
   max-width: 70%;
+  max-height: 60vh; /*  */
+  overflow-y: auto; /*  */
   padding: 12px 16px;
   border-radius: 8px;
   background-color: #f5f7fa;
 }
+
+/* 单条消息内容过长时，限制高度并在气泡内部滚动 */
+.message-content {
+  max-height: 60vh;
+  overflow-y: auto;
+}
+
 
 .message-item.user .message-content {
   background-color: #409EFF;
