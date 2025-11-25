@@ -65,12 +65,16 @@
         ref="formRef"
         :model="form"
         :rules="formRules"
-        label-width="80px"
+        label-width="100px"
       >
         <el-form-item label="名称" prop="name">
           <el-input v-model="form.name" placeholder="请输入知识库名称" />
         </el-form-item>
-        
+
+        <el-form-item label="英文标识" prop="english_name">
+          <el-input v-model="form.english_name" placeholder="请输入英文标识（如：my_kb）" />
+        </el-form-item>
+
         <el-form-item label="描述" prop="description">
           <el-input
             v-model="form.description"
@@ -132,8 +136,9 @@ const editingId = ref(null)
 
 const form = reactive({
   name: '',
+  english_name: '',
   description: '',
-  embedding_model: 'text-embedding-ada-002',
+  embedding_model: 'text-embedding-3-small',
   chunk_size: 500,
   chunk_overlap: 50
 })
@@ -142,6 +147,11 @@ const formRules = {
   name: [
     { required: true, message: '请输入知识库名称', trigger: 'blur' },
     { min: 2, max: 100, message: '名称长度在 2 到 100 个字符', trigger: 'blur' }
+  ],
+  english_name: [
+    { required: true, message: '请输入英文标识', trigger: 'blur' },
+    { pattern: /^[a-z0-9_]+$/, message: '只能包含小写字母、数字和下划线', trigger: 'blur' },
+    { min: 2, max: 50, message: '长度在 2 到 50 个字符', trigger: 'blur' }
   ],
   embedding_model: [
     { required: true, message: '请选择嵌入模型', trigger: 'change' }
@@ -173,6 +183,7 @@ const showEditDialog = (kb) => {
   dialogTitle.value = '编辑知识库'
   editingId.value = kb.id
   form.name = kb.name
+  form.english_name = kb.english_name
   form.description = kb.description
   form.embedding_model = kb.embedding_model
   form.chunk_size = kb.chunk_size
@@ -182,8 +193,9 @@ const showEditDialog = (kb) => {
 
 const resetForm = () => {
   form.name = ''
+  form.english_name = ''
   form.description = ''
-  form.embedding_model = 'text-embedding-ada-002'
+  form.embedding_model = 'text-embedding-3-small'
   form.chunk_size = 500
   form.chunk_overlap = 50
 }

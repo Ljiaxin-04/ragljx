@@ -1,12 +1,14 @@
 package document
 
 import (
+	pb "ragljx/proto/rag"
 	"ragljx/internal/middleware"
 	"ragljx/internal/pkg/response"
 	"ragljx/internal/pkg/utils"
 	"ragljx/internal/service"
 	"ragljx/ioc"
 	"ragljx/ioc/config/datasource"
+	grpcConfig "ragljx/ioc/config/grpc"
 	httpConfig "ragljx/ioc/config/http"
 	kafkaConfig "ragljx/ioc/config/kafka"
 	minioConfig "ragljx/ioc/config/minio"
@@ -31,12 +33,14 @@ func (d *DocumentAPI) Init() error {
 	db := datasource.Get()
 	minioObj := minioConfig.Get()
 	kafkaObj := kafkaConfig.Get()
+	grpcConn := grpcConfig.Get()
 
 	var minioClient = minioObj.Client()
 	var bucketName = minioObj.Bucket()
 	var kafkaWriter = kafkaObj.Producer("document-tasks")
+	var grpcClient = pb.NewRAGServiceClient(grpcConn)
 
-	d.docService = service.NewDocumentService(db, minioClient, bucketName, kafkaWriter)
+	d.docService = service.NewDocumentService(db, minioClient, bucketName, kafkaWriter, grpcClient)
 
 	// 注册路由
 	engine := httpConfig.RootRouter()

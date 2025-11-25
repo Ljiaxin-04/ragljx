@@ -7,6 +7,7 @@ import (
 	"io"
 	"mime/multipart"
 	"path/filepath"
+	pb "ragljx/proto/rag"
 	"ragljx/internal/model"
 	"ragljx/internal/pkg/errors"
 	"ragljx/internal/pkg/utils"
@@ -19,20 +20,22 @@ import (
 )
 
 type DocumentService struct {
-	docRepo  *repository.DocumentRepository
-	kbRepo   *repository.KnowledgeBaseRepository
+	docRepo     *repository.DocumentRepository
+	kbRepo      *repository.KnowledgeBaseRepository
 	minioClient *minio.Client
 	bucketName  string
 	kafkaWriter *kafka.Writer
+	grpcClient  pb.RAGServiceClient
 }
 
-func NewDocumentService(db *gorm.DB, minioClient *minio.Client, bucketName string, kafkaWriter *kafka.Writer) *DocumentService {
+func NewDocumentService(db *gorm.DB, minioClient *minio.Client, bucketName string, kafkaWriter *kafka.Writer, grpcClient pb.RAGServiceClient) *DocumentService {
 	return &DocumentService{
 		docRepo:     repository.NewDocumentRepository(db),
 		kbRepo:      repository.NewKnowledgeBaseRepository(db),
 		minioClient: minioClient,
 		bucketName:  bucketName,
 		kafkaWriter: kafkaWriter,
+		grpcClient:  grpcClient,
 	}
 }
 
@@ -45,7 +48,7 @@ type UploadRequest struct {
 // Upload 上传文档
 func (s *DocumentService) Upload(ctx context.Context, req *UploadRequest, userID int) (*model.KnowledgeDocument, error) {
 	// 检查知识库是否存在
-	_, err := s.kbRepo.GetByID(ctx, req.KnowledgeBaseID)
+	kb, err := s.kbRepo.GetByID(ctx, req.KnowledgeBaseID)
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
 			return nil, errors.ErrKBNotFound
@@ -94,7 +97,7 @@ func (s *DocumentService) Upload(ctx context.Context, req *UploadRequest, userID
 		Size:            req.File.Size,
 		Mime:            req.File.Header.Get("Content-Type"),
 		Checksum:        checksum,
-		ParsingStatus:   "pending",
+		ParsingStatus:   "parsing",
 		CreatedByID:     &userID,
 	}
 
@@ -106,20 +109,68 @@ func (s *DocumentService) Upload(ctx context.Context, req *UploadRequest, userID
 	s.kbRepo.IncrementDocumentCount(ctx, req.KnowledgeBaseID, 1)
 	s.kbRepo.UpdateTotalSize(ctx, req.KnowledgeBaseID, req.File.Size)
 
-	// 发送解析任务到 Kafka
-	taskMsg := map[string]interface{}{
-		"document_id":       doc.ID,
-		"knowledge_base_id": req.KnowledgeBaseID,
-		"object_key":        objectKey,
-		"task_type":         "parse",
-	}
-	msgBytes, _ := json.Marshal(taskMsg)
-	s.kafkaWriter.WriteMessages(ctx, kafka.Message{
-		Key:   []byte(doc.ID),
-		Value: msgBytes,
-	})
+	// 异步处理文档解析和向量化
+	go s.processDocument(context.Background(), doc, kb)
 
 	return doc, nil
+}
+
+// processDocument 处理文档解析和向量化（异步）
+func (s *DocumentService) processDocument(ctx context.Context, doc *model.KnowledgeDocument, kb *model.KnowledgeBase) {
+	// 1. 从 MinIO 下载文件内容
+	obj, err := s.minioClient.GetObject(ctx, s.bucketName, doc.ObjectKey, minio.GetObjectOptions{})
+	if err != nil {
+		s.docRepo.UpdateStatus(ctx, doc.ID, "failed", fmt.Sprintf("failed to get file from minio: %v", err))
+		return
+	}
+	defer obj.Close()
+
+	fileContent, err := io.ReadAll(obj)
+	if err != nil {
+		s.docRepo.UpdateStatus(ctx, doc.ID, "failed", fmt.Sprintf("failed to read file: %v", err))
+		return
+	}
+
+	// 2. 调用 Python gRPC 服务解析文档
+	parseResp, err := s.grpcClient.ParseDocument(ctx, &pb.ParseDocumentRequest{
+		DocumentId:  doc.ID,
+		ObjectKey:   doc.ObjectKey,
+		FileContent: fileContent,
+		MimeType:    doc.Mime,
+	})
+	if err != nil {
+		s.docRepo.UpdateStatus(ctx, doc.ID, "failed", fmt.Sprintf("failed to parse document: %v", err))
+		return
+	}
+
+	if !parseResp.Success {
+		s.docRepo.UpdateStatus(ctx, doc.ID, "failed", parseResp.ErrorMessage)
+		return
+	}
+
+	// 3. 调用 Python gRPC 服务向量化文档
+	// 使用知识库的 english_name 作为 collection_name
+	collectionName := kb.EnglishName
+	vectorizeResp, err := s.grpcClient.VectorizeDocument(ctx, &pb.VectorizeDocumentRequest{
+		DocumentId:      doc.ID,
+		Content:         parseResp.Content,
+		KnowledgeBaseId: doc.KnowledgeBaseID,
+		CollectionName:  collectionName,
+		Title:           doc.Title,
+		ObjectKey:       doc.ObjectKey,
+	})
+	if err != nil {
+		s.docRepo.UpdateStatus(ctx, doc.ID, "failed", fmt.Sprintf("failed to vectorize document: %v", err))
+		return
+	}
+
+	if !vectorizeResp.Success {
+		s.docRepo.UpdateStatus(ctx, doc.ID, "failed", vectorizeResp.ErrorMessage)
+		return
+	}
+
+	// 4. 更新文档状态为成功
+	s.docRepo.UpdateStatus(ctx, doc.ID, "ready", "")
 }
 
 // GetByID 根据 ID 获取文档

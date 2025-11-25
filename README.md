@@ -215,6 +215,45 @@ npm run preview
 | Qdrant API | 6333 | 向量数据库 API | http://localhost:6333 |
 | Qdrant Dashboard | 6334 | Qdrant 管理界面 | http://localhost:6334 |
 
+## 系统架构详解
+
+### 文档处理流程
+
+```
+用户上传文档
+    ↓
+Go 后端接收
+    ├─ 保存到 MinIO 对象存储
+    ├─ 创建数据库记录（状态：parsing）
+    └─ 启动异步 goroutine
+         ↓
+    从 MinIO 下载文件
+         ↓
+    调用 Python gRPC 服务
+         ├─ ParseDocument：解析文档内容
+         └─ VectorizeDocument：向量化并存储
+              ↓
+         Qdrant 向量数据库
+         ↓
+    更新数据库状态（ready/failed）
+```
+
+### 对话流程
+
+```
+用户发送问题
+    ↓
+Go 后端接收
+    ↓
+调用 Python gRPC 服务
+    ├─ 使用 Embedding 模型生成问题向量
+    ├─ 在 Qdrant 中检索相关文档片段
+    ├─ 构建 Prompt（问题 + 检索到的上下文）
+    └─ 调用 LLM 生成回答
+         ↓
+    返回回答 + 来源文档
+```
+
 ## API 文档
 
 ### 认证接口
@@ -223,6 +262,7 @@ npm run preview
 - `POST /api/v1/auth/register` - 用户注册
 - `POST /api/v1/auth/logout` - 用户登出
 - `POST /api/v1/auth/refresh` - 刷新 Token
+- `GET /api/v1/auth/me` - 获取当前用户信息
 
 ### 用户管理
 
@@ -238,26 +278,27 @@ npm run preview
 
 - `GET /api/v1/knowledge-bases` - 获取知识库列表
 - `GET /api/v1/knowledge-bases/:id` - 获取知识库详情
-- `POST /api/v1/knowledge-bases` - 创建知识库
+- `POST /api/v1/knowledge-bases` - 创建知识库（需要 `name` 和 `english_name` 字段）
 - `PUT /api/v1/knowledge-bases/:id` - 更新知识库
 - `DELETE /api/v1/knowledge-bases/:id` - 删除知识库
 
-### 文档管理
+### 文档管理（嵌套路由）
 
 - `GET /api/v1/knowledge-bases/:kb_id/documents` - 获取文档列表
-- `GET /api/v1/knowledge-bases/:kb_id/documents/:id` - 获取文档详情
-- `POST /api/v1/knowledge-bases/:kb_id/documents/upload` - 上传文档
-- `POST /api/v1/knowledge-bases/:kb_id/documents/:id/reprocess` - 重新处理文档
-- `DELETE /api/v1/knowledge-bases/:kb_id/documents/:id` - 删除文档
+- `GET /api/v1/knowledge-bases/:kb_id/documents/:doc_id` - 获取文档详情
+- `POST /api/v1/knowledge-bases/:kb_id/documents/upload` - 上传文档（自动解析和向量化）
+- `POST /api/v1/knowledge-bases/:kb_id/documents/:doc_id/vectorize` - 手动触发向量化
+- `DELETE /api/v1/knowledge-bases/:kb_id/documents/:doc_id` - 删除文档
 
-### 对话管理
+### 对话管理（嵌套路由）
 
 - `GET /api/v1/chat/sessions` - 获取会话列表
 - `GET /api/v1/chat/sessions/:id` - 获取会话详情
 - `GET /api/v1/chat/sessions/:id/messages` - 获取会话消息列表
 - `POST /api/v1/chat/sessions` - 创建会话
 - `POST /api/v1/chat/sessions/:id/messages` - 发送消息（非流式）
-- `POST /api/v1/chat/sessions/:id/messages/stream` - 发送消息（流式，SSE）
+- `GET /api/v1/chat/sessions/:id/messages/stream` - 发送消息（流式，SSE）
+- `PUT /api/v1/chat/sessions/:id` - 更新会话
 - `DELETE /api/v1/chat/sessions/:id` - 删除会话
 
 ## 配置说明
@@ -314,11 +355,12 @@ openai:
 1. 登录系统后，进入"知识库管理"页面
 2. 点击"创建知识库"按钮
 3. 填写知识库信息：
-   - 名称：知识库的名称
-   - 描述：知识库的描述信息
-   - 嵌入模型：选择向量化模型（默认 text-embedding-ada-002）
-   - 分块大小：文档分块的大小（默认 500）
-   - 分块重叠：分块之间的重叠大小（默认 50）
+   - **名称**：知识库的中文名称（如：技术文档库）
+   - **英文标识**：唯一的英文标识符（如：tech_docs），只能包含小写字母、数字和下划线
+   - **描述**：知识库的描述信息（可选）
+   - **嵌入模型**：选择向量化模型（默认 text-embedding-3-small）
+   - **分块大小**：文档分块的大小（默认 500）
+   - **分块重叠**：分块之间的重叠大小（默认 50）
 4. 点击"确定"创建
 
 ### 2. 上传文档
@@ -326,8 +368,17 @@ openai:
 1. 在知识库列表中，点击"查看文档"进入文档管理页面
 2. 点击"上传文档"按钮
 3. 选择要上传的文档（支持多文件上传）
-4. 系统会自动解析文档并进行向量化
-5. 等待文档状态变为"已完成"
+4. 系统会**自动异步处理**：
+   - 上传文件到 MinIO 对象存储
+   - 调用 Python gRPC 服务解析文档内容
+   - 调用 Python gRPC 服务进行向量化
+   - 存储向量到 Qdrant 数据库
+5. 等待文档状态变为"ready"（已完成）或"failed"（失败）
+
+**文档状态说明**：
+- `parsing` - 正在解析和向量化
+- `ready` - 已完成，可用于检索
+- `failed` - 处理失败，查看错误信息
 
 ### 3. 智能对话
 
@@ -389,41 +440,78 @@ go run scripts/test_config/main.go
 
 ## 开发注意事项
 
-1. **OpenAI API Key**:
-   - 必须配置有效的 OpenAI API Key 才能使用 AI 功能
-   - 可以通过环境变量 `OPENAI_API_KEY` 设置
-   - 也可以在配置文件中设置
+### 1. OpenAI API 配置
 
-2. **向量化模型**:
-   - 默认使用 `text-embedding-ada-002`
-   - 可选 `text-embedding-3-small` 或 `text-embedding-3-large`
-   - 在创建知识库时可以选择不同的模型
+**必须配置有效的 OpenAI API Key 才能使用 AI 功能**
 
-3. **对话模型**:
-   - 默认使用 `gpt-4`
-   - 可在 Python 服务配置文件中修改
+- 通过环境变量设置：`export OPENAI_API_KEY=your_key_here`
+- 或在 Python 服务配置文件中设置
+- 支持自定义 API Base URL（如使用代理或第三方服务）
 
-4. **文件大小限制**:
-   - 前端上传限制：50MB
-   - gRPC 消息大小限制：100MB
+### 2. 模型选择
 
-5. **支持的文档格式**:
-   - 文本文件：TXT, MD
-   - Office 文档：DOCX, XLSX, PPTX
-   - PDF 文档：PDF
-   - 网页文件：HTML
-   - 数据文件：CSV, JSON, XML
-   - 其他：RTF
+**嵌入模型**（用于向量化）：
+- `text-embedding-3-small` - 推荐，性价比高
+- `text-embedding-3-large` - 更高精度
+- `text-embedding-ada-002` - 旧版模型
 
-6. **前端路由守卫**:
-   - 所有页面（除登录/注册）都需要认证
-   - 未登录用户会自动重定向到登录页
-   - 管理员页面需要管理员权限
+**对话模型**（用于生成回答）：
+- `gpt-4` - 默认，质量最高
+- `gpt-3.5-turbo` - 更快，成本更低
+- 可在 Python 服务配置文件中修改
 
-7. **JWT Token**:
-   - Access Token 有效期：24 小时
-   - Refresh Token 有效期：7 天
-   - Token 存储在 localStorage 中
+### 3. 文件限制
+
+- **前端上传限制**：50MB
+- **gRPC 消息大小限制**：100MB
+- **支持的文档格式**：
+  - 文本文件：TXT, MD
+  - Office 文档：DOCX, XLSX, PPTX
+  - PDF 文档：PDF
+  - 网页文件：HTML
+  - 数据文件：CSV, JSON, XML
+  - 其他：RTF
+
+### 4. 路由和认证
+
+**RESTful API 设计**：
+- 使用嵌套路由：`/knowledge-bases/:id/documents`
+- 所有 API 需要 JWT 认证（除登录/注册）
+- Token 存储在 `localStorage`
+
+**JWT Token**：
+- Access Token 有效期：24 小时
+- Refresh Token 有效期：7 天
+- 自动刷新机制
+
+### 5. IOC 容器和路由注册
+
+**初始化顺序**（按 Priority 值）：
+1. Config 对象（priority 99）- 配置加载
+2. HTTP Server（priority 800）- 创建 Gin 引擎，注册全局中间件
+3. API 对象（priority -99）- 在 `Init()` 中调用 `Registry()` 注册路由
+
+**中间件注册**：
+- CORS、日志、恢复等中间件在 HTTP Server 的 `Init()` 中注册
+- 必须在路由注册之前完成
+
+### 6. 文档处理机制
+
+**异步处理**：
+- 上传后立即返回，后台异步处理
+- 使用 goroutine 调用 Python gRPC 服务
+- 实时更新数据库状态
+
+**状态流转**：
+```
+pending → parsing → ready
+                 ↘ failed
+```
+
+**错误处理**：
+- 解析失败或向量化失败会更新状态为 `failed`
+- 错误信息存储在数据库中
+- 用户可以查看详细错误信息
 
 ## 故障排查
 
@@ -478,13 +566,37 @@ npm run dev
 
 ### 文档上传失败
 
-**问题**: 文档上传后状态一直是"处理中"或"失败"
+**问题**: 文档上传后状态一直是"parsing"或变成"failed"
 
 **解决方案**:
-- 检查文件格式是否支持
-- 检查文件大小是否超过 50MB
-- 查看 Python 服务日志查看具体错误
-- 检查 MinIO 是否正常运行：`docker-compose ps minio`
+1. **检查文件格式**：确保文件格式在支持列表中
+2. **检查文件大小**：不超过 50MB
+3. **查看 Go 服务日志**：
+   ```bash
+   docker-compose logs -f ragljx_go
+   ```
+4. **查看 Python 服务日志**：
+   ```bash
+   docker-compose logs -f ragljx_py
+   ```
+5. **检查 gRPC 连接**：
+   - 确保 Python 服务在 50051 端口运行
+   - 检查网络连接：`telnet localhost 50051`
+6. **检查 MinIO**：
+   ```bash
+   docker-compose ps minio
+   docker-compose logs minio
+   ```
+7. **检查 Qdrant**：
+   ```bash
+   docker-compose ps qdrant
+   # 访问 Qdrant Dashboard
+   open http://localhost:6334
+   ```
+8. **检查 OpenAI API**：
+   - 确保 API Key 有效
+   - 确保有足够余额
+   - 检查网络能否访问 OpenAI API
 
 ### 前端登录后立即跳转到登录页
 

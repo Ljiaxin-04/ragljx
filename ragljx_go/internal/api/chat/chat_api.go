@@ -57,8 +57,8 @@ func (ch *ChatAPI) Registry(r gin.IRouter) {
 		api.PUT("/sessions/:id", ch.UpdateSession)
 		api.DELETE("/sessions/:id", ch.DeleteSession)
 		api.GET("/sessions/:id/messages", ch.GetMessages)
-		api.POST("/chat", ch.Chat)
-		api.POST("/chat/stream", ch.ChatStream)
+		api.POST("/sessions/:id/messages", ch.Chat)
+		api.GET("/sessions/:id/messages/stream", ch.ChatStream)
 	}
 }
 
@@ -167,11 +167,16 @@ func (ch *ChatAPI) GetMessages(c *gin.Context) {
 
 // Chat 同步聊天
 func (ch *ChatAPI) Chat(c *gin.Context) {
+	sessionID := c.Param("id")
+
 	var req service.ChatRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		response.BadRequest(c, err.Error())
 		return
 	}
+
+	// 从 URL 参数设置 session_id
+	req.SessionID = sessionID
 
 	userID, _ := middleware.GetUserID(c)
 
@@ -227,11 +232,18 @@ func (ch *ChatAPI) Chat(c *gin.Context) {
 
 // ChatStream 流式聊天
 func (ch *ChatAPI) ChatStream(c *gin.Context) {
-	var req service.ChatRequest
-	if err := c.ShouldBindJSON(&req); err != nil {
-		response.BadRequest(c, err.Error())
+	sessionID := c.Param("id")
+
+	// 从查询参数获取数据（因为是 GET 请求）
+	question := c.Query("question")
+	if question == "" {
+		response.BadRequest(c, "question is required")
 		return
 	}
+
+	var req service.ChatRequest
+	req.SessionID = sessionID
+	req.Message = question
 
 	userID, _ := middleware.GetUserID(c)
 
