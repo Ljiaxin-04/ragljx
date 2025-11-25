@@ -23,3 +23,12 @@
 2025-11-25 17:19:37.248 | INFO     | __main__:handle_sigterm:61 - Server stopped
 2025-11-25 17:19:37.259 | INFO     | __main__:handle_sigterm:59 - Received shutdown signal, stopping server...
 2025-11-25 17:19:37.264 | INFO     | __main__:handle_sigterm:61 - Server stopped
+2025-11-25 21:43:38.731 | INFO     | app.services.vector_service:__init__:46 - VectorService initialized with Qdrant at localhost:6333
+2025-11-25 21:43:38.732 | INFO     | app.services.vector_service:__init__:47 - Using embedding model: text-embedding-3-small
+2025-11-25 21:43:38.773 | INFO     | app.services.chat_service:__init__:22 - ChatService initialized with model: gpt-4
+2025-11-25 21:43:38.773 | INFO     | app.grpc_server.rag_servicer:__init__:17 - RAGServicer initialized
+2025-11-25 21:43:38.777 | INFO     | __main__:serve:55 - RAG gRPC server started on 0.0.0.0:50051
+2025-11-25 21:45:03.657 | INFO     | app.grpc_server.rag_servicer:ParseDocument:22 - Parsing document: 02370b82-f4e1-421d-9df7-2ce483d13b0c
+2025-11-25 21:45:03.664 | ERROR    | app.services.file_parser:parse:104 - Error parsing file: PyMuPDF not installed
+2025-11-25 21:54:06.658 | INFO     | __main__:handle_sigterm:59 - Received shutdown signal, stopping server...
+2025-11-25 21:54:06.679 | INFO     | __main__:handle_sigterm:61 - Server stopped

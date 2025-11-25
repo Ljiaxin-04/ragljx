@@ -97,7 +97,7 @@ func (s *DocumentService) Upload(ctx context.Context, req *UploadRequest, userID
 		Size:            req.File.Size,
 		Mime:            req.File.Header.Get("Content-Type"),
 		Checksum:        checksum,
-		ParsingStatus:   "parsing",
+		ParsingStatus:   "processing",  // 使用前端期望的状态值
 		CreatedByID:     &userID,
 	}
 
@@ -190,8 +190,12 @@ func (s *DocumentService) processDocument(ctx context.Context, doc *model.Knowle
 		return
 	}
 
-	// 4. 更新文档状态为成功
-	s.docRepo.UpdateStatus(context.Background(), doc.ID, "ready", "")
+	// 4. 更新文档状态为成功，并更新分块数
+	updates := map[string]interface{}{
+		"parsing_status": "completed",  // 使用前端期望的状态值
+		"chunk_count":    vectorizeResp.ChunkCount,
+	}
+	s.docRepo.UpdateWithMap(context.Background(), doc.ID, updates)
 }
 
 // GetByID 根据 ID 获取文档
@@ -233,7 +237,7 @@ func (s *DocumentService) Delete(ctx context.Context, id string) error {
 	}
 
 	// 从 Qdrant 删除向量（如果 gRPC 客户端可用且文档已向量化）
-	if s.grpcClient != nil && doc.ParsingStatus == "ready" && kb.EnglishName != "" {
+	if s.grpcClient != nil && doc.ParsingStatus == "completed" && kb.EnglishName != "" {
 		deleteResp, err := s.grpcClient.DeleteDocumentVectors(ctx, &pb.DeleteDocumentVectorsRequest{
 			CollectionName: kb.EnglishName,
 			DocumentIds:    []string{doc.ID},
@@ -293,7 +297,7 @@ func (s *DocumentService) Vectorize(ctx context.Context, id string) error {
 	}
 
 	// 检查文档状态
-	if doc.ParsingStatus != "ready" {
+	if doc.ParsingStatus != "completed" {
 		return errors.New(400, "document is not ready for vectorization")
 	}
 

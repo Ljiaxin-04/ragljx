@@ -119,19 +119,19 @@ class VectorService:
         content: str,
         title: str = "",
         metadata: Optional[Dict[str, Any]] = None
-    ) -> bool:
+    ) -> tuple[bool, int]:
         """
         向量化并插入文档
-        
+
         Args:
             collection_name: 集合名称
             document_id: 文档 ID
             content: 文档内容
             title: 文档标题
             metadata: 额外的元数据
-        
+
         Returns:
-            是否成功
+            (是否成功, 分块数量)
         """
         try:
             # 确保集合存在
@@ -183,10 +183,11 @@ class VectorService:
                 collection_name=collection_name,
                 points=points
             )
-            
-            logger.info(f"Upserted document {document_id} with {len(points)} chunks to {collection_name}")
-            return True
-        
+
+            chunk_count = len(points)
+            logger.info(f"Upserted document {document_id} with {chunk_count} chunks to {collection_name}")
+            return True, chunk_count
+
         except Exception as e:
             logger.error(f"Error upserting document {document_id}: {e}")
             raise

@@ -57,7 +57,7 @@ class RAGServicer(rag_service_pb2_grpc.RAGServiceServicer):
                 )
 
             # 向量化并插入
-            success = self.vector_service.upsert_document(
+            success, chunk_count = self.vector_service.upsert_document(
                 collection_name=request.collection_name,
                 document_id=request.document_id,
                 content=request.content,
@@ -70,14 +70,16 @@ class RAGServicer(rag_service_pb2_grpc.RAGServiceServicer):
 
             return rag_service_pb2.VectorizeDocumentResponse(
                 success=success,
-                error_message=""
+                error_message="",
+                chunk_count=chunk_count
             )
 
         except Exception as e:
             logger.error(f"Error vectorizing document {request.document_id}: {e}", exc_info=True)
             return rag_service_pb2.VectorizeDocumentResponse(
                 success=False,
-                error_message=f"Vectorization failed: {str(e)}"
+                error_message=f"Vectorization failed: {str(e)}",
+                chunk_count=0
             )
     
     def DeleteDocumentVectors(self, request, context):

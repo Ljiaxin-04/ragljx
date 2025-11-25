@@ -43,13 +43,14 @@ func (kb *KnowledgeBase) BeforeCreate(tx *gorm.DB) error {
 type KnowledgeDocument struct {
 	ID              string         `gorm:"type:varchar(64);primaryKey" json:"id"`
 	KnowledgeBaseID string         `gorm:"type:varchar(64);not null;index" json:"knowledge_base_id"`
-	Title           string         `gorm:"type:varchar(255);not null" json:"title"`
+	Title           string         `gorm:"type:varchar(255);not null" json:"name"`  // 前端使用 name
 	Content         string         `gorm:"type:text" json:"content"`
 	ObjectKey       string         `gorm:"type:varchar(512)" json:"object_key"`
-	Size            int64          `gorm:"default:0" json:"size"`
-	Mime            string         `gorm:"type:varchar(128)" json:"mime"`
+	Size            int64          `gorm:"default:0" json:"file_size"`  // 前端使用 file_size
+	Mime            string         `gorm:"type:varchar(128)" json:"file_type"`  // 前端使用 file_type
 	Checksum        string         `gorm:"type:varchar(128);index" json:"checksum"`
-	ParsingStatus   string         `gorm:"type:varchar(32);default:'pending';index" json:"parsing_status"`
+	ParsingStatus   string         `gorm:"type:varchar(32);default:'pending';index" json:"status"`  // 前端使用 status
+	ChunkCount      int            `gorm:"default:0" json:"chunk_count"`  // 添加分块数字段
 	ErrorMessage    string         `gorm:"type:text" json:"error_message,omitempty"`
 	IsBuiltin       bool           `gorm:"default:false" json:"is_builtin"`
 	CreatedByID     *int           `json:"created_by_id"`

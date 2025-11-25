@@ -54,6 +54,7 @@ message VectorizeDocumentRequest {
 message VectorizeDocumentResponse {
   bool success = 1;
   string error_message = 2;
+  int32 chunk_count = 3;  // 分块数量
 }
 
 // 删除文档向量请求

@@ -22,3 +22,11 @@ python-dotenv==1.0.0
 # Logging
 loguru==0.7.2
 
+# Document parsing libraries
+PyMuPDF>=1.23.21  # PDF parsing
+python-docx>=0.8.11  # DOCX parsing
+openpyxl>=3.1.0  # XLSX parsing
+python-pptx>=0.6.21  # PPTX parsing
+beautifulsoup4>=4.12.0  # HTML/XML parsing
+lxml>=4.9.0  # XML parser for BeautifulSoup
+striprtf>=0.0.26  # RTF parsing

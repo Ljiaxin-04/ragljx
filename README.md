@@ -126,7 +126,7 @@ docker-compose logs -f ragljx_py
 - 前端界面: http://localhost:5173 (开发模式)
 - 后端 API: http://localhost:8080
 - MinIO 控制台: http://localhost:9001
-- Qdrant 控制台: http://localhost:6334
+- Qdrant 控制台: http://localhost:6333
 
 7. **默认登录账号**：
 - 用户名: `admin`

@@ -64,6 +64,11 @@ func (r *DocumentRepository) UpdateStatus(ctx context.Context, id, status string
 	return r.db.WithContext(ctx).Model(&model.KnowledgeDocument{}).Where("id = ?", id).Updates(updates).Error
 }
 
+// UpdateWithMap 使用 map 更新文档字段
+func (r *DocumentRepository) UpdateWithMap(ctx context.Context, id string, updates map[string]interface{}) error {
+	return r.db.WithContext(ctx).Model(&model.KnowledgeDocument{}).Where("id = ?", id).Updates(updates).Error
+}
+
 // Delete 删除文档
 func (r *DocumentRepository) Delete(ctx context.Context, id string) error {
 	return r.db.WithContext(ctx).Delete(&model.KnowledgeDocument{}, "id = ?", id).Error
