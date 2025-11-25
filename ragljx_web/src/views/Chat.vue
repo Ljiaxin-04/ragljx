@@ -36,6 +36,18 @@
         </div>
 
         <div v-else class="chat-content">
+          <!-- 顶部标题和会话信息 -->
+          <div class="chat-header">
+            <div class="chat-header-left">
+              <div class="chat-title">
+                {{ currentSessionTitle }}
+              </div>
+              <div class="chat-subtitle">
+                {{ selectedKnowledgeBases.length > 0 ? '已启用知识库问答（RAG）' : '纯模型对话' }}
+              </div>
+            </div>
+          </div>
+
           <!-- 知识库选择 -->
           <div class="kb-selector">
             <span>选择知识库：</span>
@@ -60,18 +72,21 @@
                 <div class="message-text" v-html="formatMessage(message.content)"></div>
                 <div v-if="getSources(message).length > 0" class="message-sources">
                   <el-divider />
-                  <div class="sources-title">参考来源：</div>
-                  <div
-                    v-for="(source, index) in getSources(message)"
-                    :key="index"
-                    class="source-item"
-                  >
-                    <el-tag size="small">
-                      {{ source.title || source.document_name || '知识库文档' }}
-                    </el-tag>
-                    <span class="source-score">
-                      相似度: {{ (Number(source.score || 0) * 100).toFixed(1) }}%
-                    </span>
+                  <div class="sources-title">📚 参考来源：</div>
+                  <div v-for="(source, index) in getSources(message)" :key="index" class="source-item">
+                    <div class="source-info">
+                      <el-icon class="source-icon">
+                        <Document />
+                      </el-icon>
+                      <div class="source-text">
+                        <div class="source-name">
+                          {{ source.file_name || source.document_name || source.title || '知识库文档' }}
+                        </div>
+                        <div class="source-score">
+                          相似度: {{ (Number(source.score || 0) * 100).toFixed(1) }}%
+                        </div>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -96,15 +111,29 @@
 
           <!-- 输入框 -->
           <div class="input-area">
-            <el-input v-model="inputMessage" type="textarea" :rows="3" placeholder="请输入您的问题..."
-              @keydown.enter.exact.prevent="sendMessage" />
-            <el-button type="primary" :loading="isLoading"
-              :disabled="!inputMessage.trim() || selectedKnowledgeBases.length === 0" @click="sendMessage">
-              <el-icon>
-                <Promotion />
-              </el-icon>
-              发送
-            </el-button>
+            <div class="input-wrapper">
+              <el-input v-model="inputMessage" type="textarea" :rows="3"
+                :placeholder="selectedKnowledgeBases.length === 0 ? '请先选择知识库...' : '输入您的问题，按 Enter 发送，Shift + Enter 换行...'"
+                @keydown.enter.exact.prevent="sendMessage" :disabled="selectedKnowledgeBases.length === 0"
+                class="message-input" />
+              <div class="input-actions">
+                <div class="input-hint">
+                  <el-icon>
+                    <InfoFilled />
+                  </el-icon>
+                  <span v-if="selectedKnowledgeBases.length === 0">请先选择知识库</span>
+                  <span v-else>按 Enter 发送，Shift + Enter 换行</span>
+                </div>
+                <el-button type="primary" :loading="isLoading"
+                  :disabled="!inputMessage.trim() || selectedKnowledgeBases.length === 0" @click="sendMessage"
+                  size="large">
+                  <el-icon>
+                    <Promotion />
+                  </el-icon>
+                  {{ isLoading ? '发送中...' : '发送' }}
+                </el-button>
+              </div>
+            </div>
           </div>
         </div>
       </el-main>
@@ -113,7 +142,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, nextTick, watch } from 'vue'
+import { ref, onMounted, nextTick, watch, computed } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { useUserStore } from '@/stores/user'
 import { useChatStore } from '@/stores/chat'
@@ -140,6 +169,17 @@ const inputMessage = ref('')
 const isLoading = ref(false)
 const scrollbarRef = ref(null)
 
+
+const currentSession = computed(() =>
+  sessions.value.find((s) => s.id === currentSessionId.value) || null
+)
+
+const currentSessionTitle = computed(() =>
+  (currentSession.value && currentSession.value.title)
+    ? currentSession.value.title
+    : '新对话'
+)
+
 const fetchSessions = async () => {
   try {
     const response = await getChatSessions({ page: 1, page_size: 100 })
@@ -165,16 +205,18 @@ const getSources = (message) => {
 
   const mapped = rawSources.map((s) => ({
     document_id: s.document_id || s.DocumentID || s.id || '',
-    title: s.title || s.document_name || s.Title || '知识库文档',
+    document_name: s.document_name || s.DocumentName || '',
+    title: s.title || s.Title || '',
+    file_name: s.file_name || s.FileName || '',
     score: typeof s.score === 'number'
       ? s.score
       : (typeof s.Score === 'number' ? s.Score : 0)
   }))
 
-  // 只展示相似度最高的一个来源
+  // 按相似度排序，展示前3个来源
   if (!mapped.length) return mapped
   mapped.sort((a, b) => (b.score || 0) - (a.score || 0))
-  return mapped.slice(0, 1)
+  return mapped.slice(0, 3)
 }
 
 
@@ -235,6 +277,9 @@ const deleteSession = (session) => {
       ElMessage.error('删除失败')
     }
   }).catch(() => {
+    // 取消操作
+  })
+}
 
 // 监听知识库选择变化，实时更新后端会话配置
 watch(selectedKnowledgeBases, async (newVal) => {
@@ -260,10 +305,6 @@ watch(selectedKnowledgeBases, async (newVal) => {
     ElMessage.error('更新知识库选择失败')
   }
 })
-
-    // 取消操作
-  })
-}
 
 const sendMessage = async () => {
   if (!inputMessage.value.trim() || selectedKnowledgeBases.value.length === 0) {
@@ -296,23 +337,30 @@ const sendMessage = async () => {
       question
     })
 
-    let assistantMessage = {
-      id: Date.now() + 1,
-      role: 'assistant',
-      content: '',
-      sources: [],
-      created_at: new Date().toISOString()
-    }
-    messages.value.push(assistantMessage)
+    let assistantMessage = null
 
     eventSource.onmessage = (event) => {
       const data = JSON.parse(event.data)
 
       if (data.type === 'content') {
+        // 收到第一个内容时，立即隐藏loading并创建assistant消息
+        if (!assistantMessage) {
+          isLoading.value = false
+          assistantMessage = {
+            id: Date.now() + 1,
+            role: 'assistant',
+            content: '',
+            sources: [],
+            created_at: new Date().toISOString()
+          }
+          messages.value.push(assistantMessage)
+        }
         assistantMessage.content += data.content
         scrollToBottom()
       } else if (data.type === 'sources') {
-        assistantMessage.sources = data.sources
+        if (assistantMessage) {
+          assistantMessage.sources = data.sources
+        }
       } else if (data.type === 'error') {
         eventSource.close()
         isLoading.value = false
@@ -347,31 +395,6 @@ const scrollToBottom = () => {
   })
 }
 
-// 监听知识库选择变化，实时更新后端会话配置
-watch(selectedKnowledgeBases, async (newVal) => {
-  if (!currentSessionId.value) return
-
-  try {
-    await updateChatSession(currentSessionId.value, {
-      knowledge_base_ids: newVal,
-      use_rag: newVal.length > 0
-    })
-
-    const index = sessions.value.findIndex((s) => s.id === currentSessionId.value)
-    if (index !== -1) {
-      sessions.value[index] = {
-        ...sessions.value[index],
-        knowledge_base_ids: [...newVal],
-        use_rag: newVal.length > 0
-      }
-    }
-  } catch (error) {
-    console.error('Update session knowledge bases failed:', error)
-    ElMessage.error('更新知识库选择失败')
-  }
-})
-
-
 const formatMessage = (content) => {
   if (!content) return ''
   // 简单的 Markdown 转换
@@ -405,8 +428,14 @@ onMounted(() => {
   height: calc(100vh - 120px);
   background: white;
   border-radius: 8px;
-  overflow: hidden; /* 防止内容超出卡片区域 */
+  overflow: hidden;
+  /* 防止内容超出卡片区域 */
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.chat-container :deep(.el-container) {
+  height: 100%;
+  /* 确保容器占满父元素高度 */
 }
 
 .session-sidebar {
@@ -434,22 +463,27 @@ onMounted(() => {
 }
 
 .session-item {
-  padding: 12px;
+  padding: 14px;
   margin-bottom: 8px;
-  border-radius: 6px;
+  border-radius: 8px;
   cursor: pointer;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  transition: background-color 0.3s;
+  transition: all 0.3s;
+  border: 1px solid transparent;
 }
 
 .session-item:hover {
   background-color: #f5f7fa;
+  border-color: #e6e6e6;
+  transform: translateX(4px);
 }
 
 .session-item.active {
   background-color: #ecf5ff;
+  border-color: #409EFF;
+  box-shadow: 0 2px 8px rgba(64, 158, 255, 0.2);
 }
 
 .session-info {
@@ -459,31 +493,44 @@ onMounted(() => {
 
 .session-title {
   font-size: 14px;
+  font-weight: 500;
   color: #333;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  margin-bottom: 4px;
+}
+
+.session-item.active .session-title {
+  color: #409EFF;
 }
 
 .session-time {
   font-size: 12px;
   color: #999;
-  margin-top: 4px;
 }
 
 .delete-icon {
   color: #999;
   cursor: pointer;
+  transition: all 0.3s;
+  padding: 4px;
+  border-radius: 4px;
 }
 
 .delete-icon:hover {
   color: #f56c6c;
+  background-color: rgba(245, 108, 108, 0.1);
 }
 
 .chat-main {
   padding: 0;
   display: flex;
   flex-direction: column;
+  height: 100%;
+  /* 确保主区域占满高度 */
+  overflow: hidden;
+  /* 防止主区域本身滚动 */
 }
 
 .empty-chat {
@@ -497,25 +544,84 @@ onMounted(() => {
   height: 100%;
   display: flex;
   flex-direction: column;
+  overflow: hidden;
+  /* 确保内容不会超出容器 */
 }
 
+/* 顶部标题栏样式 */
+.chat-header {
+  padding: 16px 20px 8px;
+  border-bottom: 1px solid #f0f0f0;
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  flex-shrink: 0;
+  /* 防止标题栏被压缩 */
+}
+
+.chat-header-left {
+  display: flex;
+  flex-direction: column;
+}
+
+.chat-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: #303133;
+}
+
+.chat-subtitle {
+  margin-top: 4px;
+  font-size: 12px;
+  color: #909399;
+}
+
+/* 优化消息区域的留白和行距 - 已移至下方统一定义 */
+
 .kb-selector {
-  padding: 15px 20px;
+  padding: 16px 20px;
   border-bottom: 1px solid #e6e6e6;
+  background-color: #fafafa;
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
+  flex-shrink: 0;
+  /* 防止知识库选择器被压缩 */
+}
+
+.kb-selector span {
+  font-size: 14px;
+  font-weight: 500;
+  color: #606266;
+  white-space: nowrap;
 }
 
 .message-list {
   flex: 1;
+  overflow-y: auto;
+  /* 允许消息列表滚动 */
+  min-height: 0;
+  /* 确保 flex 子元素可以正确收缩 */
   padding: 20px;
 }
 
 .message-item {
   display: flex;
   gap: 12px;
-  margin-bottom: 20px;
+  margin-bottom: 24px;
+  animation: fadeIn 0.3s ease-in;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .message-item.user {
@@ -527,51 +633,98 @@ onMounted(() => {
 }
 
 .message-content {
-  max-width: 70%;
-  max-height: 60vh; /*  */
-  overflow-y: auto; /*  */
-  padding: 12px 16px;
-  border-radius: 8px;
-  background-color: #f5f7fa;
-}
-
-/* 单条消息内容过长时，限制高度并在气泡内部滚动 */
-.message-content {
-  max-height: 60vh;
+  max-width: 75%;
+  max-height: 400px;
+  /* 限制单个消息的最大高度，避免占据过多空间 */
   overflow-y: auto;
+  padding: 14px 18px;
+  border-radius: 12px;
+  background-color: #f5f7fa;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  transition: all 0.3s;
 }
 
+.message-content:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
 
 .message-item.user .message-content {
-  background-color: #409EFF;
+  background: linear-gradient(135deg, #409EFF 0%, #66b1ff 100%);
   color: white;
 }
 
 .message-text {
-  line-height: 1.6;
+  line-height: 1.8;
   word-break: break-word;
+  font-size: 14px;
+}
+
+.message-item.user .message-text {
+  color: white;
 }
 
 .message-sources {
-  margin-top: 10px;
+  margin-top: 12px;
+  padding: 10px;
+  background-color: rgba(64, 158, 255, 0.05);
+  border-radius: 6px;
+  border-left: 3px solid #409EFF;
 }
 
 .sources-title {
-  font-size: 12px;
-  color: #666;
-  margin-bottom: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #409EFF;
+  margin-bottom: 10px;
 }
 
 .source-item {
+  margin-bottom: 8px;
+  padding: 8px;
+  background-color: white;
+  border-radius: 4px;
+  transition: all 0.3s;
+}
+
+.source-item:hover {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transform: translateX(2px);
+}
+
+.source-item:last-child {
+  margin-bottom: 0;
+}
+
+.source-info {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 8px;
+}
+
+.source-icon {
+  color: #409EFF;
+  font-size: 16px;
+  margin-top: 2px;
+  flex-shrink: 0;
+}
+
+.source-text {
+  flex: 1;
+  min-width: 0;
+}
+
+.source-name {
+  font-size: 13px;
+  color: #333;
+  font-weight: 500;
   margin-bottom: 4px;
-  font-size: 12px;
+  word-break: break-all;
 }
 
 .source-score {
-  color: #999;
+  font-size: 12px;
+  color: #67C23A;
+  font-weight: 500;
 }
 
 .typing-indicator {
@@ -609,13 +762,56 @@ onMounted(() => {
 }
 
 .input-area {
-  padding: 20px;
+  padding: 16px 20px;
   border-top: 1px solid #e6e6e6;
-  display: flex;
-  gap: 10px;
+  background-color: #fafafa;
+  flex-shrink: 0;
+  /* 防止输入框被压缩 */
 }
 
-.input-area .el-textarea {
-  flex: 1;
+.input-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.message-input {
+  width: 100%;
+}
+
+.message-input :deep(.el-textarea__inner) {
+  border-radius: 8px;
+  border: 2px solid #e6e6e6;
+  transition: all 0.3s;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.message-input :deep(.el-textarea__inner):focus {
+  border-color: #409EFF;
+  box-shadow: 0 0 0 2px rgba(64, 158, 255, 0.1);
+}
+
+.message-input :deep(.el-textarea__inner):disabled {
+  background-color: #f5f5f5;
+  cursor: not-allowed;
+}
+
+.input-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.input-hint {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: #909399;
+}
+
+.input-hint .el-icon {
+  font-size: 14px;
 }
 </style>

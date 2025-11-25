@@ -188,6 +188,20 @@ func (ch *ChatAPI) Chat(c *gin.Context) {
 		return
 	}
 
+	// 获取历史消息，用于构造上下文
+	historyMessages, _, err := ch.chatService.GetMessages(c.Request.Context(), req.SessionID, userID, 1, 50)
+	if err != nil {
+		response.Error(c, 500, "failed to get chat history: "+err.Error())
+		return
+	}
+	var history []*pb.ChatMessage
+	for _, m := range historyMessages {
+		history = append(history, &pb.ChatMessage{
+			Role:    m.Role,
+			Content: m.Content,
+		})
+	}
+
 	// 保存用户消息
 	ch.chatService.SaveMessage(c.Request.Context(), req.SessionID, "user", req.Message, nil, 0)
 
@@ -208,10 +222,11 @@ func (ch *ChatAPI) Chat(c *gin.Context) {
 	grpcReq := &pb.ChatRequest{
 		Query:               req.Message,
 		UseRag:              session.UseRAG,
-		KnowledgeBaseIds:    collectionNames,  // 使用 english_name 而不是 UUID
+		KnowledgeBaseIds:    collectionNames, // 使用 english_name 而不是 UUID
 		TopK:                int32(session.TopK),
 		SimilarityThreshold: float32(session.SimilarityThreshold),
 		SimilarityWeight:    float32(session.SimilarityWeight),
+		History:             history,
 	}
 
 	grpcResp, err := ch.grpcClient.Chat(c.Request.Context(), grpcReq)
@@ -288,6 +303,20 @@ func (ch *ChatAPI) ChatStream(c *gin.Context) {
 		return
 	}
 
+	// 获取历史消息，用于构造上下文
+	historyMessages, _, err := ch.chatService.GetMessages(c.Request.Context(), req.SessionID, userID, 1, 50)
+	if err != nil {
+		response.Error(c, 500, "failed to get chat history: "+err.Error())
+		return
+	}
+	var history []*pb.ChatMessage
+	for _, m := range historyMessages {
+		history = append(history, &pb.ChatMessage{
+			Role:    m.Role,
+			Content: m.Content,
+		})
+	}
+
 	// 检查 gRPC 客户端是否可用
 	if ch.grpcClient == nil {
 		response.Error(c, 500, "gRPC client is not initialized")
@@ -308,10 +337,11 @@ func (ch *ChatAPI) ChatStream(c *gin.Context) {
 	grpcReq := &pb.ChatRequest{
 		Query:               req.Message,
 		UseRag:              session.UseRAG,
-		KnowledgeBaseIds:    collectionNames,  // 使用 english_name 而不是 UUID
+		KnowledgeBaseIds:    collectionNames, // 使用 english_name 而不是 UUID
 		TopK:                int32(session.TopK),
 		SimilarityThreshold: float32(session.SimilarityThreshold),
 		SimilarityWeight:    float32(session.SimilarityWeight),
+		History:             history,
 	}
 
 	stream, err := ch.grpcClient.ChatStream(c.Request.Context(), grpcReq)
