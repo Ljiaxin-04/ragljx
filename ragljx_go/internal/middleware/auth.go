@@ -11,23 +11,28 @@ import (
 // JWTAuth JWT 认证中间件
 func JWTAuth() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		// 从 Header 获取 token
+		// 优先从 Header 获取 Bearer token
 		authHeader := c.GetHeader("Authorization")
-		if authHeader == "" {
-			response.Unauthorized(c, "missing authorization header")
-			c.Abort()
-			return
-		}
+		var tokenString string
 
-		// 解析 Bearer token
-		parts := strings.SplitN(authHeader, " ", 2)
-		if len(parts) != 2 || parts[0] != "Bearer" {
-			response.Unauthorized(c, "invalid authorization header")
-			c.Abort()
-			return
+		if authHeader != "" {
+			// 解析 Bearer token
+			parts := strings.SplitN(authHeader, " ", 2)
+			if len(parts) != 2 || parts[0] != "Bearer" {
+				response.Unauthorized(c, "invalid authorization header")
+				c.Abort()
+				return
+			}
+			tokenString = parts[1]
+		} else {
+			// 兼容 EventSource 等无法自定义 header 的场景，从 query 参数 token 获取
+			tokenString = c.Query("token")
+			if tokenString == "" {
+				response.Unauthorized(c, "missing authorization header")
+				c.Abort()
+				return
+			}
 		}
-
-		tokenString := parts[1]
 
 		// 验证 token
 		claims, err := jwt.ParseToken(tokenString)

@@ -62,3 +62,31 @@
 2025-11-25 22:35:46.883 | INFO     | app.services.chat_service:__init__:22 - ChatService initialized with model: deepseek-chat
 2025-11-25 22:35:46.883 | INFO     | app.grpc_server.rag_servicer:__init__:17 - RAGServicer initialized
 2025-11-25 22:35:46.887 | INFO     | __main__:serve:55 - RAG gRPC server started on 0.0.0.0:50051
+2025-11-25 22:42:05.194 | INFO     | __main__:handle_sigterm:59 - Received shutdown signal, stopping server...
+2025-11-25 22:42:05.207 | INFO     | __main__:handle_sigterm:61 - Server stopped
+2025-11-25 22:42:14.668 | INFO     | app.services.vector_service:__init__:46 - VectorService initialized with Qdrant at localhost:6333
+2025-11-25 22:42:14.668 | INFO     | app.services.vector_service:__init__:47 - Using embedding model: text-embedding-3-small
+2025-11-25 22:42:14.710 | INFO     | app.services.chat_service:__init__:22 - ChatService initialized with model: deepseek-chat
+2025-11-25 22:42:14.710 | INFO     | app.grpc_server.rag_servicer:__init__:17 - RAGServicer initialized
+2025-11-25 22:42:14.715 | INFO     | __main__:serve:55 - RAG gRPC server started on 0.0.0.0:50051
+2025-11-25 22:43:25.661 | INFO     | app.grpc_server.rag_servicer:ChatStream:164 - Chat stream request: 请问B 树和 B+树的区别是什么？... use_rag=True
+2025-11-25 23:08:46.129 | INFO     | __main__:handle_sigterm:59 - Received shutdown signal, stopping server...
+2025-11-25 23:08:46.187 | INFO     | __main__:handle_sigterm:61 - Server stopped
+2025-11-25 23:08:46.269 | INFO     | __main__:handle_sigterm:59 - Received shutdown signal, stopping server...
+2025-11-25 23:08:46.270 | INFO     | __main__:handle_sigterm:61 - Server stopped
+2025-11-25 23:08:56.591 | INFO     | app.services.vector_service:__init__:46 - VectorService initialized with Qdrant at localhost:6333
+2025-11-25 23:08:56.592 | INFO     | app.services.vector_service:__init__:47 - Using embedding model: text-embedding-3-small
+2025-11-25 23:08:56.634 | INFO     | app.services.chat_service:__init__:22 - ChatService initialized with model: deepseek-chat
+2025-11-25 23:08:56.635 | INFO     | app.grpc_server.rag_servicer:__init__:17 - RAGServicer initialized
+2025-11-25 23:08:56.637 | INFO     | __main__:serve:55 - RAG gRPC server started on 0.0.0.0:50051
+2025-11-25 23:11:32.968 | INFO     | app.grpc_server.rag_servicer:ChatStream:164 - Chat stream request: 请问B 树和 B+树的区别是什么？... use_rag=True
+2025-11-25 23:11:35.290 | INFO     | app.services.vector_service:query:288 - Query collection liangjiaxin_ceshi returned 0 results
+2025-11-25 23:36:19.402 | INFO     | __main__:handle_sigterm:59 - Received shutdown signal, stopping server...
+2025-11-25 23:36:19.458 | INFO     | __main__:handle_sigterm:61 - Server stopped
+2025-11-25 23:36:27.033 | INFO     | app.services.vector_service:__init__:46 - VectorService initialized with Qdrant at localhost:6333
+2025-11-25 23:36:27.034 | INFO     | app.services.vector_service:__init__:47 - Using embedding model: text-embedding-3-small
+2025-11-25 23:36:27.098 | INFO     | app.services.chat_service:__init__:22 - ChatService initialized with model: deepseek-chat
+2025-11-25 23:36:27.098 | INFO     | app.grpc_server.rag_servicer:__init__:17 - RAGServicer initialized
+2025-11-25 23:36:27.101 | INFO     | __main__:serve:55 - RAG gRPC server started on 0.0.0.0:50051
+2025-11-25 23:37:09.478 | INFO     | app.grpc_server.rag_servicer:ChatStream:164 - Chat stream request: B+ 树只在叶子节点存数据吗... use_rag=True
+2025-11-25 23:37:11.941 | INFO     | app.services.vector_service:query:288 - Query collection liangjiaxin_ceshi returned 0 results

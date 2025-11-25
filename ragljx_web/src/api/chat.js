@@ -33,6 +33,17 @@ export function getChatSession(sessionId) {
 }
 
 /**
+ * 更新会话
+ */
+export function updateChatSession(sessionId, data) {
+  return request({
+    url: `/chat/sessions/${sessionId}`,
+    method: 'put',
+    data
+  })
+}
+
+/**
  * 删除会话
  */
 export function deleteChatSession(sessionId) {
