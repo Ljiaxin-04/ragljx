@@ -241,6 +241,7 @@ type VectorizeDocumentResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Success       bool                   `protobuf:"varint,1,opt,name=success,proto3" json:"success,omitempty"`
 	ErrorMessage  string                 `protobuf:"bytes,2,opt,name=error_message,json=errorMessage,proto3" json:"error_message,omitempty"`
+	ChunkCount    int32                  `protobuf:"varint,3,opt,name=chunk_count,json=chunkCount,proto3" json:"chunk_count,omitempty"` // 分块数量
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -287,6 +288,13 @@ func (x *VectorizeDocumentResponse) GetErrorMessage() string {
 		return x.ErrorMessage
 	}
 	return ""
+}
+
+func (x *VectorizeDocumentResponse) GetChunkCount() int32 {
+	if x != nil {
+		return x.ChunkCount
+	}
+	return 0
 }
 
 // 删除文档向量请求
@@ -886,10 +894,12 @@ const file_proto_rag_rag_service_proto_rawDesc = "" +
 	"\x0fcollection_name\x18\x04 \x01(\tR\x0ecollectionName\x12\x14\n" +
 	"\x05title\x18\x05 \x01(\tR\x05title\x12\x1d\n" +
 	"\n" +
-	"object_key\x18\x06 \x01(\tR\tobjectKey\"Z\n" +
+	"object_key\x18\x06 \x01(\tR\tobjectKey\"u\n" +
 	"\x19VectorizeDocumentResponse\x12\x18\n" +
 	"\asuccess\x18\x01 \x01(\bR\asuccess\x12#\n" +
-	"\rerror_message\x18\x02 \x01(\tR\ferrorMessage\"j\n" +
+	"\rerror_message\x18\x02 \x01(\tR\ferrorMessage\x12\x1f\n" +
+	"\vchunk_count\x18\x03 \x01(\x05R\n" +
+	"chunkCount\"j\n" +
 	"\x1cDeleteDocumentVectorsRequest\x12!\n" +
 	"\fdocument_ids\x18\x01 \x03(\tR\vdocumentIds\x12'\n" +
 	"\x0fcollection_name\x18\x02 \x01(\tR\x0ecollectionName\"\x83\x01\n" +
