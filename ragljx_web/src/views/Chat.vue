@@ -163,13 +163,18 @@ const getSources = (message) => {
 
   const rawSources = message.sources || message.rag_sources || []
 
-  return rawSources.map((s) => {
-    return {
-      document_id: s.document_id || s.DocumentID || s.id || '',
-      title: s.title || s.document_name || s.Title || '知识库文档',
-      score: typeof s.score === 'number' ? s.score : (typeof s.Score === 'number' ? s.Score : 0)
-    }
-  })
+  const mapped = rawSources.map((s) => ({
+    document_id: s.document_id || s.DocumentID || s.id || '',
+    title: s.title || s.document_name || s.Title || '知识库文档',
+    score: typeof s.score === 'number'
+      ? s.score
+      : (typeof s.Score === 'number' ? s.Score : 0)
+  }))
+
+  // 只展示相似度最高的一个来源
+  if (!mapped.length) return mapped
+  mapped.sort((a, b) => (b.score || 0) - (a.score || 0))
+  return mapped.slice(0, 1)
 }
 
 
