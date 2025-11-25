@@ -105,3 +105,12 @@ func IsAdmin(c *gin.Context) bool {
 	return isAdmin.(bool)
 }
 
+// ValidateToken 验证 token 并返回用户 ID
+func ValidateToken(tokenString string) (int, error) {
+	claims, err := jwt.ParseToken(tokenString)
+	if err != nil {
+		return 0, err
+	}
+	return claims.UserID, nil
+}
+

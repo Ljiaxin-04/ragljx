@@ -228,21 +228,27 @@ class VectorService:
     ) -> List[Dict[str, Any]]:
         """
         查询相似文档
-        
+
         Args:
             collection_name: 集合名称
             query_text: 查询文本
             top_k: 返回结果数量
             score_threshold: 相似度阈值
             filter_dict: 过滤条件
-        
+
         Returns:
             相似文档列表
         """
         try:
+            # 检查集合是否存在
+            collections = self.qdrant_client.get_collections().collections
+            if not any(c.name == collection_name for c in collections):
+                logger.warning(f"Collection {collection_name} does not exist, skipping query")
+                return []
+
             # 生成查询向量
             query_vector = self.embedding.get_text_embedding(query_text)
-            
+
             # 构建过滤器
             query_filter = None
             if filter_dict:
@@ -252,7 +258,7 @@ class VectorService:
                         FieldCondition(key=key, match=MatchValue(value=value))
                     )
                 query_filter = Filter(must=conditions)
-            
+
             # 执行查询
             search_result = self.qdrant_client.search(
                 collection_name=collection_name,
@@ -261,7 +267,7 @@ class VectorService:
                 query_filter=query_filter,
                 score_threshold=score_threshold
             )
-            
+
             # 转换结果
             results = []
             for hit in search_result:
@@ -272,10 +278,11 @@ class VectorService:
                     "score": hit.score,
                     "chunk_index": hit.payload.get("chunk_index", 0)
                 })
-            
+
+            logger.info(f"Query collection {collection_name} returned {len(results)} results")
             return results
-        
+
         except Exception as e:
-            logger.error(f"Error querying collection {collection_name}: {e}")
+            logger.error(f"Error querying collection {collection_name}: {e}", exc_info=True)
             return []
 

@@ -222,37 +222,65 @@ npm run preview
 ```
 用户上传文档
     ↓
-Go 后端接收
-    ├─ 保存到 MinIO 对象存储
+Go 后端接收 (POST /api/v1/knowledge-bases/:id/documents/upload)
+    ├─ 计算文件 MD5 checksum
+    ├─ 保存到 MinIO 对象存储（bucket: ragljx）
     ├─ 创建数据库记录（状态：parsing）
     └─ 启动异步 goroutine
          ↓
-    从 MinIO 下载文件
+    从 MinIO 下载文件内容
          ↓
-    调用 Python gRPC 服务
-         ├─ ParseDocument：解析文档内容
-         └─ VectorizeDocument：向量化并存储
+    调用 Python gRPC 服务 ParseDocument()
+         ├─ 根据 MIME 类型选择解析器
+         ├─ 支持格式：PDF, DOCX, XLSX, PPTX, TXT, MD, HTML, CSV, JSON, XML, RTF
+         └─ 返回纯文本内容
               ↓
-         Qdrant 向量数据库
-         ↓
+    调用 Python gRPC 服务 VectorizeDocument()
+         ├─ 使用 SentenceSplitter 分块（chunk_size=500, overlap=50）
+         ├─ 调用 OpenAI Embedding API 生成向量
+         ├─ Collection Name = kb.EnglishName（如：my_kb）
+         └─ 存储到 Qdrant 向量数据库
+              ↓
     更新数据库状态（ready/failed）
 ```
+
+**关键点**：
+- Collection Name 使用知识库的 `english_name` 字段
+- 每个文档分块后生成多个向量点，ID 格式：`{document_id}_{chunk_index}`
+- 向量维度：1536（text-embedding-3-small）
+- 距离度量：Cosine 相似度
 
 ### 对话流程
 
 ```
 用户发送问题
     ↓
-Go 后端接收
-    ↓
-调用 Python gRPC 服务
-    ├─ 使用 Embedding 模型生成问题向量
-    ├─ 在 Qdrant 中检索相关文档片段
-    ├─ 构建 Prompt（问题 + 检索到的上下文）
-    └─ 调用 LLM 生成回答
+Go 后端接收 (POST /api/v1/chat/sessions/:id/messages)
+    ├─ 验证 JWT Token
+    ├─ 获取会话配置（知识库 IDs、TopK、相似度阈值等）
+    ├─ 查询知识库的 english_name 列表
+    └─ 保存用户消息到数据库
          ↓
-    返回回答 + 来源文档
+调用 Python gRPC 服务 Chat() 或 ChatStream()
+    ├─ 如果 use_rag=true：
+    │   ├─ 使用 Embedding 模型生成问题向量
+    │   ├─ 在 Qdrant 中检索相关文档片段（按 english_name 查询）
+    │   ├─ 按相似度排序并去重
+    │   └─ 构建 RAG 上下文
+    ├─ 构建 Prompt（系统提示 + RAG 上下文 + 历史对话 + 当前问题）
+    └─ 调用 LLM 生成回答（deepseek-chat）
+         ↓
+    返回回答 + 来源文档（包含 document_id, title, score, snippet）
+         ↓
+Go 后端保存助手消息到数据库
+    └─ 返回给前端
 ```
+
+**关键点**：
+- 使用知识库的 `english_name` 作为 Qdrant collection name 进行检索
+- 支持多知识库联合检索（跨多个 collection）
+- 流式对话使用 SSE（Server-Sent Events）
+- Token 通过 query 参数传递（EventSource 不支持自定义 headers）
 
 ## API 文档
 
@@ -607,6 +635,98 @@ npm run dev
 - 检查后端 API 是否正常返回 Token
 - 清除浏览器 localStorage：`localStorage.clear()`
 - 检查后端 CORS 配置
+
+### 对话失败或无回复
+
+**问题**: 对话时提示错误或无法获取回答
+
+**解决方案**:
+1. **检查 Python 服务**：
+   ```bash
+   docker-compose logs -f ragljx_py
+   # 或本地运行
+   ps aux | grep python
+   ```
+2. **检查 gRPC 连接**：
+   ```bash
+   telnet localhost 50051
+   # 或
+   nc -zv localhost 50051
+   ```
+3. **检查知识库配置**：
+   - 确保会话关联的知识库存在
+   - 确保知识库有 `english_name` 字段
+   - 确保知识库中有状态为 `ready` 的文档
+4. **检查 Qdrant Collection**：
+   ```bash
+   # 访问 Qdrant Dashboard
+   open http://localhost:6334
+   # 检查 collection 是否存在，名称应该是知识库的 english_name
+   ```
+5. **检查 OpenAI API**：
+   - 验证 API Key 有效
+   - 验证余额充足
+   - 检查网络连接
+6. **常见错误**：
+   - `collection not found`: 知识库没有文档或文档未向量化
+   - `invalid token`: JWT Token 过期或无效
+   - `knowledge base not found`: 知识库 ID 错误或已删除
+   - `failed to get knowledge base collection names`: 知识库缺少 `english_name` 字段
+
+## 测试检查清单
+
+### 文档上传测试
+
+1. **创建知识库**：
+   - 填写名称和 **english_name**（必填！）
+   - 记录知识库 ID
+
+2. **上传文档**：
+   - 选择支持的文件格式
+   - 观察状态变化：`parsing` → `ready` 或 `failed`
+
+3. **检查 Qdrant**：
+   ```bash
+   # 访问 Qdrant Dashboard
+   open http://localhost:6334
+   # 查看 collections，应该有名为 {english_name} 的 collection
+   ```
+
+4. **检查日志**：
+   ```bash
+   # Go 服务日志
+   tail -f ragljx/ragljx_go/logs/app.log
+
+   # Python 服务日志
+   tail -f ragljx/ragljx_py/logs/app.log
+   ```
+
+### 对话测试
+
+1. **创建会话**：
+   - 选择知识库
+   - 启用 RAG
+   - 设置 TopK 和相似度阈值
+
+2. **发送消息**：
+   - 测试非流式对话
+   - 测试流式对话
+   - 检查是否返回来源文档
+
+3. **验证检索**：
+   - 查看返回的 `rag_sources`
+   - 确认 `document_id`、`title`、`score` 字段正确
+
+### 常见问题自查
+
+- [ ] 所有基础设施服务正常运行（PostgreSQL, Redis, Kafka, MinIO, Qdrant）
+- [ ] Python gRPC 服务在 50051 端口运行
+- [ ] Go 后端服务在 8080 端口运行
+- [ ] 知识库有 `english_name` 字段
+- [ ] 文档状态为 `ready`
+- [ ] Qdrant 中存在对应的 collection
+- [ ] OpenAI API Key 有效且有余额
+- [ ] 网络可以访问 OpenAI API
 
 ## 停止服务
 

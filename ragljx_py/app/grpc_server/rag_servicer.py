@@ -46,7 +46,16 @@ class RAGServicer(rag_service_pb2_grpc.RAGServiceServicer):
         """向量化文档"""
         try:
             logger.info(f"Vectorizing document: {request.document_id} to collection: {request.collection_name}")
-            
+
+            # 检查内容是否为空
+            if not request.content or not request.content.strip():
+                error_msg = "Document content is empty"
+                logger.warning(f"{error_msg}: {request.document_id}")
+                return rag_service_pb2.VectorizeDocumentResponse(
+                    success=False,
+                    error_message=error_msg
+                )
+
             # 向量化并插入
             success = self.vector_service.upsert_document(
                 collection_name=request.collection_name,
@@ -58,17 +67,17 @@ class RAGServicer(rag_service_pb2_grpc.RAGServiceServicer):
                     "object_key": request.object_key
                 }
             )
-            
+
             return rag_service_pb2.VectorizeDocumentResponse(
                 success=success,
-                error_message="" if success else "Vectorization failed"
+                error_message=""
             )
-        
+
         except Exception as e:
-            logger.error(f"Error vectorizing document: {e}")
+            logger.error(f"Error vectorizing document {request.document_id}: {e}", exc_info=True)
             return rag_service_pb2.VectorizeDocumentResponse(
                 success=False,
-                error_message=str(e)
+                error_message=f"Vectorization failed: {str(e)}"
             )
     
     def DeleteDocumentVectors(self, request, context):

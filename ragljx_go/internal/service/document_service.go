@@ -109,6 +109,12 @@ func (s *DocumentService) Upload(ctx context.Context, req *UploadRequest, userID
 	s.kbRepo.IncrementDocumentCount(ctx, req.KnowledgeBaseID, 1)
 	s.kbRepo.UpdateTotalSize(ctx, req.KnowledgeBaseID, req.File.Size)
 
+	// 检查 gRPC 客户端是否可用
+	if s.grpcClient == nil {
+		s.docRepo.UpdateStatus(ctx, doc.ID, "failed", "gRPC client is not initialized")
+		return doc, nil
+	}
+
 	// 异步处理文档解析和向量化
 	go s.processDocument(context.Background(), doc, kb)
 
@@ -117,17 +123,21 @@ func (s *DocumentService) Upload(ctx context.Context, req *UploadRequest, userID
 
 // processDocument 处理文档解析和向量化（异步）
 func (s *DocumentService) processDocument(ctx context.Context, doc *model.KnowledgeDocument, kb *model.KnowledgeBase) {
+	// 创建带超时的 context（10 分钟超时）
+	ctx, cancel := context.WithTimeout(ctx, 10*time.Minute)
+	defer cancel()
+
 	// 1. 从 MinIO 下载文件内容
 	obj, err := s.minioClient.GetObject(ctx, s.bucketName, doc.ObjectKey, minio.GetObjectOptions{})
 	if err != nil {
-		s.docRepo.UpdateStatus(ctx, doc.ID, "failed", fmt.Sprintf("failed to get file from minio: %v", err))
+		s.docRepo.UpdateStatus(context.Background(), doc.ID, "failed", fmt.Sprintf("failed to get file from minio: %v", err))
 		return
 	}
 	defer obj.Close()
 
 	fileContent, err := io.ReadAll(obj)
 	if err != nil {
-		s.docRepo.UpdateStatus(ctx, doc.ID, "failed", fmt.Sprintf("failed to read file: %v", err))
+		s.docRepo.UpdateStatus(context.Background(), doc.ID, "failed", fmt.Sprintf("failed to read file: %v", err))
 		return
 	}
 
@@ -139,18 +149,29 @@ func (s *DocumentService) processDocument(ctx context.Context, doc *model.Knowle
 		MimeType:    doc.Mime,
 	})
 	if err != nil {
-		s.docRepo.UpdateStatus(ctx, doc.ID, "failed", fmt.Sprintf("failed to parse document: %v", err))
+		s.docRepo.UpdateStatus(context.Background(), doc.ID, "failed", fmt.Sprintf("failed to parse document: %v", err))
 		return
 	}
 
 	if !parseResp.Success {
-		s.docRepo.UpdateStatus(ctx, doc.ID, "failed", parseResp.ErrorMessage)
+		s.docRepo.UpdateStatus(context.Background(), doc.ID, "failed", parseResp.ErrorMessage)
+		return
+	}
+
+	// 检查解析内容是否为空
+	if parseResp.Content == "" {
+		s.docRepo.UpdateStatus(context.Background(), doc.ID, "failed", "parsed content is empty")
 		return
 	}
 
 	// 3. 调用 Python gRPC 服务向量化文档
 	// 使用知识库的 english_name 作为 collection_name
 	collectionName := kb.EnglishName
+	if collectionName == "" {
+		s.docRepo.UpdateStatus(context.Background(), doc.ID, "failed", "knowledge base english_name is empty")
+		return
+	}
+
 	vectorizeResp, err := s.grpcClient.VectorizeDocument(ctx, &pb.VectorizeDocumentRequest{
 		DocumentId:      doc.ID,
 		Content:         parseResp.Content,
@@ -160,17 +181,17 @@ func (s *DocumentService) processDocument(ctx context.Context, doc *model.Knowle
 		ObjectKey:       doc.ObjectKey,
 	})
 	if err != nil {
-		s.docRepo.UpdateStatus(ctx, doc.ID, "failed", fmt.Sprintf("failed to vectorize document: %v", err))
+		s.docRepo.UpdateStatus(context.Background(), doc.ID, "failed", fmt.Sprintf("failed to vectorize document: %v", err))
 		return
 	}
 
 	if !vectorizeResp.Success {
-		s.docRepo.UpdateStatus(ctx, doc.ID, "failed", vectorizeResp.ErrorMessage)
+		s.docRepo.UpdateStatus(context.Background(), doc.ID, "failed", vectorizeResp.ErrorMessage)
 		return
 	}
 
 	// 4. 更新文档状态为成功
-	s.docRepo.UpdateStatus(ctx, doc.ID, "ready", "")
+	s.docRepo.UpdateStatus(context.Background(), doc.ID, "ready", "")
 }
 
 // GetByID 根据 ID 获取文档

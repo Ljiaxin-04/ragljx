@@ -190,11 +190,24 @@ func (ch *ChatAPI) Chat(c *gin.Context) {
 	// 保存用户消息
 	ch.chatService.SaveMessage(c.Request.Context(), req.SessionID, "user", req.Message, nil, 0)
 
+	// 检查 gRPC 客户端是否可用
+	if ch.grpcClient == nil {
+		response.Error(c, 500, "gRPC client is not initialized")
+		return
+	}
+
+	// 获取知识库的 english_name 列表（用作 collection name）
+	collectionNames, err := ch.chatService.GetKnowledgeBaseCollectionNames(c.Request.Context(), []string(session.KnowledgeBaseIDs))
+	if err != nil {
+		response.Error(c, 500, "failed to get knowledge base collection names: "+err.Error())
+		return
+	}
+
 	// 调用 Python gRPC 服务
 	grpcReq := &pb.ChatRequest{
 		Query:               req.Message,
 		UseRag:              session.UseRAG,
-		KnowledgeBaseIds:    []string(session.KnowledgeBaseIDs),
+		KnowledgeBaseIds:    collectionNames,  // 使用 english_name 而不是 UUID
 		TopK:                int32(session.TopK),
 		SimilarityThreshold: float32(session.SimilarityThreshold),
 		SimilarityWeight:    float32(session.SimilarityWeight),
@@ -245,7 +258,27 @@ func (ch *ChatAPI) ChatStream(c *gin.Context) {
 	req.SessionID = sessionID
 	req.Message = question
 
-	userID, _ := middleware.GetUserID(c)
+	// EventSource 不支持自定义 headers，所以从 query 参数获取 token
+	token := c.Query("token")
+	if token == "" {
+		// 如果 query 中没有 token，尝试从 header 获取
+		token = c.GetHeader("Authorization")
+		if token != "" && len(token) > 7 && token[:7] == "Bearer " {
+			token = token[7:]
+		}
+	}
+
+	if token == "" {
+		response.Unauthorized(c, "token is required")
+		return
+	}
+
+	// 验证 token 并获取 userID
+	userID, err := middleware.ValidateToken(token)
+	if err != nil {
+		response.Unauthorized(c, "invalid token")
+		return
+	}
 
 	// 获取会话信息
 	session, err := ch.chatService.GetSessionByID(c.Request.Context(), req.SessionID, userID)
@@ -254,14 +287,27 @@ func (ch *ChatAPI) ChatStream(c *gin.Context) {
 		return
 	}
 
+	// 检查 gRPC 客户端是否可用
+	if ch.grpcClient == nil {
+		response.Error(c, 500, "gRPC client is not initialized")
+		return
+	}
+
 	// 保存用户消息
 	ch.chatService.SaveMessage(c.Request.Context(), req.SessionID, "user", req.Message, nil, 0)
+
+	// 获取知识库的 english_name 列表（用作 collection name）
+	collectionNames, err := ch.chatService.GetKnowledgeBaseCollectionNames(c.Request.Context(), []string(session.KnowledgeBaseIDs))
+	if err != nil {
+		response.Error(c, 500, "failed to get knowledge base collection names: "+err.Error())
+		return
+	}
 
 	// 调用 Python gRPC 服务（流式）
 	grpcReq := &pb.ChatRequest{
 		Query:               req.Message,
 		UseRag:              session.UseRAG,
-		KnowledgeBaseIds:    []string(session.KnowledgeBaseIDs),
+		KnowledgeBaseIds:    collectionNames,  // 使用 english_name 而不是 UUID
 		TopK:                int32(session.TopK),
 		SimilarityThreshold: float32(session.SimilarityThreshold),
 		SimilarityWeight:    float32(session.SimilarityWeight),

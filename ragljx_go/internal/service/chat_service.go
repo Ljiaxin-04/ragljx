@@ -256,3 +256,30 @@ func (s *ChatService) SaveMessage(ctx context.Context, sessionID, role, content 
 	return message, nil
 }
 
+// GetKnowledgeBaseCollectionNames 获取知识库的 collection names（english_name）
+func (s *ChatService) GetKnowledgeBaseCollectionNames(ctx context.Context, kbIDs []string) ([]string, error) {
+	collectionNames := make([]string, 0, len(kbIDs))
+
+	for _, kbID := range kbIDs {
+		kb, err := s.kbRepo.GetByID(ctx, kbID)
+		if err != nil {
+			if err == gorm.ErrRecordNotFound {
+				// 跳过不存在的知识库
+				continue
+			}
+			return nil, errors.Wrap(500, "failed to get knowledge base", err)
+		}
+
+		// 使用 english_name 作为 collection name
+		if kb.EnglishName != "" {
+			collectionNames = append(collectionNames, kb.EnglishName)
+		} else {
+			// 如果 english_name 为空，记录警告但继续
+			// 这里可以考虑返回错误，取决于业务需求
+			continue
+		}
+	}
+
+	return collectionNames, nil
+}
+
