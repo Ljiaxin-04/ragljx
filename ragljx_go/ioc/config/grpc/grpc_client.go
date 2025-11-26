@@ -37,6 +37,7 @@ func (g *GRPCClient) Priority() int {
 }
 
 func (g *GRPCClient) Init() error {
+	// 为了稳定暂用Dial，暂时不改为NewClient
 	conn, err := grpc.Dial(g.PythonAddr, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		return err
