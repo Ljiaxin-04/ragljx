@@ -354,6 +354,7 @@ func (ch *ChatAPI) ChatStream(c *gin.Context) {
 	c.Header("Content-Type", "text/event-stream")
 	c.Header("Cache-Control", "no-cache")
 	c.Header("Connection", "keep-alive")
+	c.Header("X-Accel-Buffering", "no")
 
 	// 流式返回
 	fullContent := ""
@@ -373,6 +374,7 @@ func (ch *ChatAPI) ChatStream(c *gin.Context) {
 			}
 			errorJSON, _ := json.Marshal(errorData)
 			c.SSEvent("message", string(errorJSON))
+			c.Writer.Flush()
 			break
 		}
 
@@ -421,5 +423,5 @@ func (ch *ChatAPI) ChatStream(c *gin.Context) {
 	}
 	doneJSON, _ := json.Marshal(doneData)
 	c.SSEvent("message", string(doneJSON))
+	c.Writer.Flush()
 }
-

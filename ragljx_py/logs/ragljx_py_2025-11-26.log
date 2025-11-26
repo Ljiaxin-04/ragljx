@@ -95,3 +95,22 @@
 2025-11-26 15:04:09.407 | INFO     | app.services.vector_service:query:288 - Query collection liangjiaxin_ceshi returned 0 results
 2025-11-26 15:04:09.408 | INFO     | app.services.chat_service:retrieve_documents:57 - No results from liangjiaxin_ceshi with threshold 0.699999988079071, retrying without threshold
 2025-11-26 15:04:11.075 | INFO     | app.services.vector_service:query:288 - Query collection liangjiaxin_ceshi returned 5 results
+2025-11-26 15:56:05.071 | INFO     | __main__:handle_sigterm:59 - Received shutdown signal, stopping server...
+2025-11-26 15:56:05.191 | INFO     | __main__:handle_sigterm:61 - Server stopped
+2025-11-26 16:09:55.099 | INFO     | app.services.vector_service:__init__:46 - VectorService initialized with Qdrant at localhost:6333
+2025-11-26 16:09:55.101 | INFO     | app.services.vector_service:__init__:47 - Using embedding model: text-embedding-3-small
+2025-11-26 16:09:55.175 | INFO     | app.services.chat_service:__init__:22 - ChatService initialized with model: deepseek-chat
+2025-11-26 16:09:55.175 | INFO     | app.grpc_server.rag_servicer:__init__:17 - RAGServicer initialized
+2025-11-26 16:09:55.179 | INFO     | __main__:serve:55 - RAG gRPC server started on 0.0.0.0:50051
+2025-11-26 16:10:55.910 | INFO     | app.grpc_server.rag_servicer:ParseDocument:22 - Parsing document: 318013c8-33c0-48b4-8539-34d62f6121b0
+2025-11-26 16:10:55.978 | INFO     | app.grpc_server.rag_servicer:VectorizeDocument:48 - Vectorizing document: 318013c8-33c0-48b4-8539-34d62f6121b0 to collection: my_golang
+2025-11-26 16:10:56.102 | INFO     | app.services.vector_service:create_collection:90 - Created collection: my_golang
+2025-11-26 16:11:03.155 | INFO     | app.services.vector_service:upsert_document:188 - Upserted document 318013c8-33c0-48b4-8539-34d62f6121b0 with 3 chunks to my_golang
+2025-11-26 16:12:51.879 | INFO     | app.grpc_server.rag_servicer:ChatStream:164 - Chat stream request: 什么是... use_rag=True
+2025-11-26 16:12:53.445 | INFO     | app.services.vector_service:query:288 - Query collection my_golang returned 0 results
+2025-11-26 16:12:53.447 | INFO     | app.services.chat_service:retrieve_documents:57 - No results from my_golang with threshold 0.699999988079071, retrying without threshold
+2025-11-26 16:12:54.718 | INFO     | app.services.vector_service:query:288 - Query collection my_golang returned 3 results
+2025-11-26 16:13:07.891 | INFO     | app.grpc_server.rag_servicer:ChatStream:164 - Chat stream request: 什么是GC垃圾回收... use_rag=True
+2025-11-26 16:13:08.989 | INFO     | app.services.vector_service:query:288 - Query collection my_golang returned 0 results
+2025-11-26 16:13:08.990 | INFO     | app.services.chat_service:retrieve_documents:57 - No results from my_golang with threshold 0.699999988079071, retrying without threshold
+2025-11-26 16:13:10.540 | INFO     | app.services.vector_service:query:288 - Query collection my_golang returned 3 results

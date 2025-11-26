@@ -7,6 +7,7 @@ import (
 	"io"
 	"mime/multipart"
 	"path/filepath"
+	"strings"
 	pb "ragljx/proto/rag"
 	"ragljx/internal/model"
 	"ragljx/internal/pkg/errors"
@@ -45,6 +46,15 @@ type UploadRequest struct {
 	File            *multipart.FileHeader `form:"file" binding:"required"`
 }
 
+// 支持的文件扩展名（小写）
+var allowedExtensions = map[string]struct{}{
+	".txt": {}, ".md": {}, ".pdf": {}, ".docx": {}, ".xlsx": {}, ".pptx": {}, ".html": {}, ".htm": {},
+	".csv": {}, ".json": {}, ".xml": {}, ".rtf": {},
+}
+
+// 最大文件尺寸（50MB）
+const maxUploadSize = int64(50 * 1024 * 1024)
+
 // Upload 上传文档
 func (s *DocumentService) Upload(ctx context.Context, req *UploadRequest, userID int) (*model.KnowledgeDocument, error) {
 	// 检查知识库是否存在
@@ -54,6 +64,15 @@ func (s *DocumentService) Upload(ctx context.Context, req *UploadRequest, userID
 			return nil, errors.ErrKBNotFound
 		}
 		return nil, errors.Wrap(500, "failed to get knowledge base", err)
+	}
+
+	// 基础校验：大小与扩展名
+	if req.File.Size > maxUploadSize {
+		return nil, errors.New(400, "file too large: maximum 50MB")
+	}
+	ext := strings.ToLower(filepath.Ext(req.File.Filename))
+	if _, ok := allowedExtensions[ext]; !ok {
+		return nil, errors.New(400, fmt.Sprintf("unsupported file type: %s", ext))
 	}
 
 	// 打开文件
@@ -323,4 +342,3 @@ func (s *DocumentService) Vectorize(ctx context.Context, id string) error {
 
 	return nil
 }
-
