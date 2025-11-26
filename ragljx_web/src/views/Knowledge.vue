@@ -69,47 +69,51 @@
     <el-dialog
       v-model="dialogVisible"
       :title="dialogTitle"
-      width="500px"
+      width="520px"
+      class="glass-dialog"
     >
-      <el-form
-        ref="formRef"
-        :model="form"
-        :rules="formRules"
-        label-width="100px"
-      >
-        <el-form-item label="名称" prop="name">
-          <el-input v-model="form.name" placeholder="请输入知识库名称" />
-        </el-form-item>
+      <div class="dialog-body">
+        <el-form
+          ref="formRef"
+          :model="form"
+          :rules="formRules"
+          label-width="100px"
+        >
+          <el-form-item label="名称" prop="name">
+            <el-input v-model="form.name" placeholder="请输入知识库名称" />
+          </el-form-item>
 
-        <el-form-item label="英文标识" prop="english_name">
-          <el-input v-model="form.english_name" placeholder="请输入英文标识（如：my_kb）" />
-        </el-form-item>
+          <el-form-item label="英文标识" prop="english_name">
+            <el-input v-model="form.english_name" placeholder="请输入英文标识（如：my_kb）" />
+          </el-form-item>
 
-        <el-form-item label="描述" prop="description">
-          <el-input
-            v-model="form.description"
-            type="textarea"
-            :rows="4"
-            placeholder="请输入知识库描述"
-          />
-        </el-form-item>
-        
-        <el-form-item label="嵌入模型" prop="embedding_model">
-          <el-select v-model="form.embedding_model" placeholder="请选择嵌入模型">
-            <el-option label="text-embedding-ada-002" value="text-embedding-ada-002" />
-            <el-option label="text-embedding-3-small" value="text-embedding-3-small" />
-            <el-option label="text-embedding-3-large" value="text-embedding-3-large" />
-          </el-select>
-        </el-form-item>
-        
-        <el-form-item label="分块大小" prop="chunk_size">
-          <el-input-number v-model="form.chunk_size" :min="100" :max="2000" :step="100" />
-        </el-form-item>
-        
-        <el-form-item label="分块重叠" prop="chunk_overlap">
-          <el-input-number v-model="form.chunk_overlap" :min="0" :max="500" :step="50" />
-        </el-form-item>
-      </el-form>
+          <el-form-item label="描述" prop="description">
+            <el-input
+              v-model="form.description"
+              type="textarea"
+              :rows="4"
+              placeholder="请输入知识库描述"
+            />
+          </el-form-item>
+          
+          <el-form-item label="嵌入模型" prop="embedding_model">
+            <el-select v-model="form.embedding_model" placeholder="请选择嵌入模型" class="full-width">
+              <el-option label="text-embedding-ada-002" value="text-embedding-ada-002" />
+              <el-option label="text-embedding-3-small" value="text-embedding-3-small" />
+              <el-option label="text-embedding-3-large" value="text-embedding-3-large" />
+            </el-select>
+          </el-form-item>
+          
+          <div class="inline-fields">
+            <el-form-item label="分块大小" prop="chunk_size">
+              <el-input-number v-model="form.chunk_size" :min="100" :max="2000" :step="100" />
+            </el-form-item>
+            <el-form-item label="分块重叠" prop="chunk_overlap">
+              <el-input-number v-model="form.chunk_overlap" :min="0" :max="500" :step="50" />
+            </el-form-item>
+          </div>
+        </el-form>
+      </div>
       
       <template #footer>
         <el-button @click="dialogVisible = false">取消</el-button>
@@ -391,5 +395,32 @@ onMounted(() => {
 
 .kb-actions .el-button {
   flex: 1;
+}
+
+.glass-dialog :deep(.el-dialog__body) {
+  background: rgba(255, 255, 255, 0.85);
+  border-radius: 12px;
+  backdrop-filter: blur(12px);
+}
+
+.glass-dialog :deep(.el-dialog__header) {
+  border-bottom: none;
+}
+
+.dialog-body {
+  background: linear-gradient(135deg, rgba(43, 104, 255, 0.05), rgba(17, 207, 161, 0.05));
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 12px;
+  padding: 12px;
+}
+
+.full-width {
+  width: 100%;
+}
+
+.inline-fields {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 12px;
 }
 </style>
