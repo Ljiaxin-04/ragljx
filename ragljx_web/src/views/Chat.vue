@@ -185,7 +185,9 @@ const currentSessionTitle = computed(() =>
 const fetchSessions = async () => {
   try {
     const response = await getChatSessions({ page: 1, page_size: 100 })
-    sessions.value = response.data?.items || []
+    const items = response.data?.items || []
+    // 按创建时间倒序展示，最近的在上
+    sessions.value = [...items].sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
   } catch (error) {
     console.error('Fetch sessions failed:', error)
   }
@@ -330,6 +332,19 @@ const sendMessage = async () => {
   messages.value.push(userMessage)
   scrollToBottom()
 
+  // 如果会话标题还是默认“新对话”，自动更新为首条提问的前30字符
+  if (currentSession.value && (!currentSession.value.title || currentSession.value.title.startsWith('新对话'))) {
+    const newTitle = question.slice(0, 30)
+    updateChatSession(currentSession.value.id, { title: newTitle }).then(() => {
+      // 同步前端列表与 store
+      const idx = sessions.value.findIndex((s) => s.id === currentSession.value.id)
+      if (idx !== -1) sessions.value[idx] = { ...sessions.value[idx], title: newTitle }
+      chatStore.setCurrentSession({ ...currentSession.value, title: newTitle })
+    }).catch((err) => {
+      console.error('Update session title failed:', err)
+    })
+  }
+
   isLoading.value = true
 
   try {
@@ -348,6 +363,7 @@ const sendMessage = async () => {
     let assistantMessage = null
     let buffer = ''
     let flushTimer = null
+    let pendingSources = []
 
     const ensureAssistantMessage = () => {
       if (!assistantMessage) {
@@ -387,12 +403,13 @@ const sendMessage = async () => {
         isLoading.value = false
       } else if (data.type === 'content') {
         ensureAssistantMessage()
+        // 若后台未发送 start 事件，第一次内容也能关闭 loading
+        isLoading.value = false
         buffer += data.content || ''
         scheduleFlush()
       } else if (data.type === 'sources') {
-        if (assistantMessage) {
-          assistantMessage.sources = data.sources
-        }
+        pendingSources = data.sources || []
+        isLoading.value = false
       } else if (data.type === 'error') {
         eventSource.close()
         eventSourceRef.value = null
@@ -403,6 +420,8 @@ const sendMessage = async () => {
         eventSource.close()
         eventSourceRef.value = null
         flushBuffer()
+        ensureAssistantMessage()
+        assistantMessage.sources = pendingSources
         isLoading.value = false
       }
     }
@@ -446,13 +465,12 @@ const formatMessage = (content) => {
 const formatDateTime = (dateString) => {
   if (!dateString) return ''
   const date = new Date(dateString)
-  const now = new Date()
-  const diff = now - date
-
-  if (diff < 60000) return '刚刚'
-  if (diff < 3600000) return Math.floor(diff / 60000) + ' 分钟前'
-  if (diff < 86400000) return Math.floor(diff / 3600000) + ' 小时前'
-  return date.toLocaleDateString('zh-CN')
+  if (isNaN(date.getTime())) return ''
+  // 统一显示为 UTC+8（北京时间）
+  return date.toLocaleString('zh-CN', {
+    hour12: false,
+    timeZone: 'Asia/Shanghai'
+  })
 }
 
 onMounted(() => {
