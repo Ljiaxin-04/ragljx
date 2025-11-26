@@ -34,9 +34,9 @@
           </template>
         </el-table-column>
 
-        <el-table-column prop="file_type" label="文件类型" width="120">
+        <el-table-column prop="file_type" label="文件类型" width="140">
           <template #default="{ row }">
-            <el-tag size="small">{{ row.file_type }}</el-tag>
+            <el-tag size="small">{{ formatFileType(row.file_type, row.name) }}</el-tag>
           </template>
         </el-table-column>
 
@@ -48,9 +48,18 @@
 
         <el-table-column prop="status" label="状态" width="120">
           <template #default="{ row }">
-            <el-tag :type="getStatusType(row.status)" size="small">
-              {{ getStatusText(row.status) }}
-            </el-tag>
+            <div class="status-cell">
+              <el-tag :type="getStatusType(row.status)" size="small">
+                {{ getStatusText(row.status) }}
+              </el-tag>
+              <el-progress
+                v-if="row.status === 'processing' || row.status === 'pending'"
+                :indeterminate="true"
+                :stroke-width="4"
+                :show-text="false"
+                class="inline-progress"
+              />
+            </div>
           </template>
         </el-table-column>
 
@@ -88,7 +97,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import {
@@ -108,6 +117,7 @@ const documents = ref([])
 const currentPage = ref(1)
 const pageSize = ref(20)
 const total = ref(0)
+const pollTimer = ref(null)
 
 const uploadUrl = computed(() => {
   const baseURL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080/api/v1'
@@ -144,6 +154,12 @@ const fetchDocuments = async () => {
     ElMessage.error('获取文档列表失败')
   } finally {
     loading.value = false
+    // 如果还有处理中/待处理的文档，保持轮询，否则清理
+    const hasProcessing = documents.value.some(d => d.status === 'processing' || d.status === 'pending')
+    if (!hasProcessing && pollTimer.value) {
+      clearInterval(pollTimer.value)
+      pollTimer.value = null
+    }
   }
 }
 
@@ -192,6 +208,7 @@ const beforeUpload = (file) => {
 const handleUploadSuccess = () => {
   ElMessage.success('上传成功')
   fetchDocuments()
+  startPolling()
 }
 
 const handleUploadError = (error) => {
@@ -204,6 +221,7 @@ const handleReprocess = async (doc) => {
     await reprocessDocument(kbId.value, doc.id)
     ElMessage.success('已提交重新处理请求')
     fetchDocuments()
+    startPolling()
   } catch (error) {
     console.error('Reprocess failed:', error)
     ElMessage.error('重新处理失败')
@@ -246,6 +264,19 @@ const formatDateTime = (dateString) => {
   return date.toLocaleString('zh-CN')
 }
 
+const formatFileType = (mime, name) => {
+  if (!mime && name) {
+    const ext = name.split('.').pop() || ''
+    return ext.toLowerCase()
+  }
+  // mime like application/pdf -> pdf
+  if (mime && mime.includes('/')) {
+    const part = mime.split('/').pop() || mime
+    return part.toLowerCase()
+  }
+  return mime || '-'
+}
+
 const getStatusType = (status) => {
   const typeMap = {
     pending: 'info',
@@ -266,9 +297,23 @@ const getStatusText = (status) => {
   return textMap[status] || status
 }
 
+const startPolling = () => {
+  if (pollTimer.value) return
+  pollTimer.value = setInterval(() => {
+    fetchDocuments()
+  }, 500)
+}
+
 onMounted(() => {
   fetchKnowledgeBase()
   fetchDocuments()
+})
+
+onUnmounted(() => {
+  if (pollTimer.value) {
+    clearInterval(pollTimer.value)
+    pollTimer.value = null
+  }
 })
 </script>
 
@@ -300,6 +345,16 @@ onMounted(() => {
   display: flex;
   align-items: center;
   gap: 8px;
+}
+
+.status-cell {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.inline-progress {
+  width: 68px;
 }
 
 .pagination {
