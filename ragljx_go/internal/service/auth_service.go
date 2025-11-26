@@ -71,6 +71,7 @@ func (s *AuthService) Login(ctx context.Context, req *LoginRequest) (*LoginRespo
 	user.LastLoginAt = &now
 	if err := s.userRepo.Update(ctx, user); err != nil {
 		// 不影响登录流程，只记录错误
+		// 实质上应该打印一条日志
 	}
 
 	return &LoginResponse{
