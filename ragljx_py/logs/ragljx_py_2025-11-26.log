@@ -1,0 +1,9 @@
+2025-11-26 18:48:11.469 | INFO     | app.services.vector_service:__init__:46 - VectorService initialized with Qdrant at localhost:6333
+2025-11-26 18:48:11.470 | INFO     | app.services.vector_service:__init__:47 - Using embedding model: text-embedding-3-small
+2025-11-26 18:48:11.512 | INFO     | app.services.chat_service:__init__:22 - ChatService initialized with model: deepseek-chat
+2025-11-26 18:48:11.513 | INFO     | app.grpc_server.rag_servicer:__init__:17 - RAGServicer initialized
+2025-11-26 18:48:11.516 | INFO     | __main__:serve:55 - RAG gRPC server started on 0.0.0.0:50051
+2025-11-26 18:50:31.611 | INFO     | app.grpc_server.rag_servicer:ChatStream:164 - Chat stream request: B+树的优势是什么？... use_rag=True
+2025-11-26 18:50:33.220 | INFO     | app.services.vector_service:query:288 - Query collection liangjiaxin_ceshi returned 0 results
+2025-11-26 18:50:33.224 | INFO     | app.services.chat_service:retrieve_documents:57 - No results from liangjiaxin_ceshi with threshold 0.699999988079071, retrying without threshold
+2025-11-26 18:50:34.214 | INFO     | app.services.vector_service:query:288 - Query collection liangjiaxin_ceshi returned 5 results

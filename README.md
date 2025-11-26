@@ -33,6 +33,35 @@ RAG 知识库系统是一个开箱即用的企业级智能文档管理与对话�
 
 ---
 
+## 🖼 界面预览
+
+<table>
+<tr>
+<td align="center"><b>📊 系统首页</b></td>
+<td align="center"><b>📚 知识库管理</b></td>
+</tr>
+<tr>
+<td><img src="ragljx_web/screenshots/1001.png" width="400"/></td>
+<td><img src="ragljx_web/screenshots/1002.png" width="400"/></td>
+</tr>
+<tr>
+<td align="center"><b>📄 文档管理</b></td>
+<td align="center"><b>💬 智能对话</b></td>
+</tr>
+<tr>
+<td><img src="ragljx_web/screenshots/1003.png" width="400"/></td>
+<td><img src="ragljx_web/screenshots/1004.png" width="400"/></td>
+</tr>
+<tr>
+<td align="center" colspan="2"><b>👤 用户管理</b></td>
+</tr>
+<tr>
+<td align="center" colspan="2"><img src="ragljx_web/screenshots/1005.png" width="600"/></td>
+</tr>
+</table>
+
+---
+
 ## ✨ 功能特性
 
 <table>
