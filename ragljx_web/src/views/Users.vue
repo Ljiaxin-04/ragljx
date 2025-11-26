@@ -15,9 +15,9 @@
         style="width: 100%"
       >
         <el-table-column prop="username" label="用户名" width="150" />
-        <el-table-column label="昵称" width="150">
+        <el-table-column label="昵称" width="180">
           <template #default="{ row }">
-            {{ row.real_name || '-' }}
+            {{ row.username || '-' }}
           </template>
         </el-table-column>
         <el-table-column prop="email" label="邮箱" width="200" />
@@ -30,7 +30,7 @@
               size="small"
               style="margin-right: 5px"
             >
-              {{ role.name }}
+              {{ formatRoleName(role.name) }}
             </el-tag>
           </template>
         </el-table-column>
@@ -104,7 +104,7 @@
         </el-form-item>
         
         <el-form-item label="昵称" prop="real_name">
-          <el-input v-model="form.real_name" placeholder="请输入昵称" />
+          <el-input v-model="form.real_name" placeholder="不填则默认使用用户名" />
         </el-form-item>
         
         <el-form-item label="邮箱" prop="email">
@@ -183,6 +183,15 @@ const formRules = {
     { required: true, message: '请输入密码', trigger: 'blur' },
     { min: 6, max: 50, message: '密码长度在 6 到 50 个字符', trigger: 'blur' }
   ]
+}
+
+const roleNameMap = {
+  admin: '系统管理员',
+  user: '普通用户'
+}
+
+const formatRoleName = (name) => {
+  return roleNameMap[name] || name || '-'
 }
 
 const fetchUsers = async () => {
