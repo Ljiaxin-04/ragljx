@@ -36,3 +36,39 @@
 2025-11-26 01:03:48.667 | INFO     | app.services.vector_service:query:288 - Query collection liangjiaxin_ceshi returned 5 results
 2025-11-26 01:05:00.510 | INFO     | __main__:handle_sigterm:59 - Received shutdown signal, stopping server...
 2025-11-26 01:05:00.515 | INFO     | __main__:handle_sigterm:61 - Server stopped
+2025-11-26 11:33:39.281 | INFO     | app.services.vector_service:__init__:46 - VectorService initialized with Qdrant at localhost:6333
+2025-11-26 11:33:39.281 | INFO     | app.services.vector_service:__init__:47 - Using embedding model: text-embedding-3-small
+2025-11-26 11:33:39.325 | INFO     | app.services.chat_service:__init__:22 - ChatService initialized with model: deepseek-chat
+2025-11-26 11:33:39.325 | INFO     | app.grpc_server.rag_servicer:__init__:17 - RAGServicer initialized
+2025-11-26 11:33:39.328 | INFO     | __main__:serve:55 - RAG gRPC server started on 0.0.0.0:50051
+2025-11-26 11:35:03.757 | INFO     | app.grpc_server.rag_servicer:ChatStream:164 - Chat stream request: B+ 树只在叶子节点存数据吗... use_rag=True
+2025-11-26 11:35:05.120 | INFO     | app.services.vector_service:query:288 - Query collection liangjiaxin_ceshi returned 0 results
+2025-11-26 11:35:05.122 | INFO     | app.services.chat_service:retrieve_documents:57 - No results from liangjiaxin_ceshi with threshold 0.699999988079071, retrying without threshold
+2025-11-26 11:35:06.181 | INFO     | app.services.vector_service:query:288 - Query collection liangjiaxin_ceshi returned 5 results
+2025-11-26 11:40:08.634 | INFO     | app.grpc_server.rag_servicer:ChatStream:164 - Chat stream request: B+ 树只在叶子节点存数据吗... use_rag=True
+2025-11-26 11:40:09.804 | INFO     | app.services.vector_service:query:288 - Query collection liangjiaxin_ceshi returned 0 results
+2025-11-26 11:40:09.805 | INFO     | app.services.chat_service:retrieve_documents:57 - No results from liangjiaxin_ceshi with threshold 0.699999988079071, retrying without threshold
+2025-11-26 11:40:10.985 | INFO     | app.services.vector_service:query:288 - Query collection liangjiaxin_ceshi returned 5 results
+2025-11-26 11:47:35.714 | INFO     | app.grpc_server.rag_servicer:ChatStream:164 - Chat stream request: B+ 树只在叶子节点存数据吗... use_rag=True
+2025-11-26 11:47:38.802 | INFO     | app.services.vector_service:query:288 - Query collection liangjiaxin_ceshi returned 0 results
+2025-11-26 11:47:38.803 | INFO     | app.services.chat_service:retrieve_documents:57 - No results from liangjiaxin_ceshi with threshold 0.699999988079071, retrying without threshold
+2025-11-26 11:47:51.233 | INFO     | app.services.vector_service:query:288 - Query collection liangjiaxin_ceshi returned 5 results
+2025-11-26 11:48:25.573 | INFO     | __main__:handle_sigterm:59 - Received shutdown signal, stopping server...
+2025-11-26 11:48:25.598 | INFO     | __main__:handle_sigterm:61 - Server stopped
+2025-11-26 11:48:31.914 | INFO     | app.services.vector_service:__init__:46 - VectorService initialized with Qdrant at localhost:6333
+2025-11-26 11:48:31.914 | INFO     | app.services.vector_service:__init__:47 - Using embedding model: text-embedding-3-small
+2025-11-26 11:48:31.957 | INFO     | app.services.chat_service:__init__:22 - ChatService initialized with model: deepseek-chat
+2025-11-26 11:48:31.957 | INFO     | app.grpc_server.rag_servicer:__init__:17 - RAGServicer initialized
+2025-11-26 11:48:31.960 | INFO     | __main__:serve:55 - RAG gRPC server started on 0.0.0.0:50051
+2025-11-26 11:49:17.273 | INFO     | app.grpc_server.rag_servicer:ChatStream:164 - Chat stream request: B+ 树只在叶子节点存数据吗... use_rag=True
+2025-11-26 11:49:18.623 | INFO     | app.services.vector_service:query:288 - Query collection liangjiaxin_ceshi returned 0 results
+2025-11-26 11:49:18.623 | INFO     | app.services.chat_service:retrieve_documents:57 - No results from liangjiaxin_ceshi with threshold 0.699999988079071, retrying without threshold
+2025-11-26 11:49:19.590 | INFO     | app.services.vector_service:query:288 - Query collection liangjiaxin_ceshi returned 5 results
+2025-11-26 11:49:56.524 | INFO     | app.grpc_server.rag_servicer:ChatStream:164 - Chat stream request: B+ 树只在叶子节点存数据吗... use_rag=True
+2025-11-26 11:49:57.557 | INFO     | app.services.vector_service:query:288 - Query collection liangjiaxin_ceshi returned 0 results
+2025-11-26 11:49:57.558 | INFO     | app.services.chat_service:retrieve_documents:57 - No results from liangjiaxin_ceshi with threshold 0.699999988079071, retrying without threshold
+2025-11-26 11:49:58.558 | INFO     | app.services.vector_service:query:288 - Query collection liangjiaxin_ceshi returned 5 results
+2025-11-26 11:52:00.049 | INFO     | app.grpc_server.rag_servicer:ChatStream:164 - Chat stream request: B+ 树只在叶子节点存数据吗... use_rag=True
+2025-11-26 11:52:01.745 | INFO     | app.services.vector_service:query:288 - Query collection liangjiaxin_ceshi returned 0 results
+2025-11-26 11:52:01.747 | INFO     | app.services.chat_service:retrieve_documents:57 - No results from liangjiaxin_ceshi with threshold 0.699999988079071, retrying without threshold
+2025-11-26 11:52:03.288 | INFO     | app.services.vector_service:query:288 - Query collection liangjiaxin_ceshi returned 5 results

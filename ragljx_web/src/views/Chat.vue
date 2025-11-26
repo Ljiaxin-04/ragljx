@@ -142,7 +142,8 @@
 </template>
 
 <script setup>
-import { ref, onMounted, nextTick, watch, computed } from 'vue'
+import { ref, onMounted, nextTick, watch, computed, reactive } from 'vue'
+import { onBeforeUnmount } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { useUserStore } from '@/stores/user'
 import { useChatStore } from '@/stores/chat'
@@ -168,6 +169,7 @@ const selectedKnowledgeBases = ref([])
 const inputMessage = ref('')
 const isLoading = ref(false)
 const scrollbarRef = ref(null)
+const eventSourceRef = ref(null)
 
 
 const currentSession = computed(() =>
@@ -331,41 +333,76 @@ const sendMessage = async () => {
   isLoading.value = true
 
   try {
+    // 关闭上一个流，防止多个连接阻塞 UI
+    if (eventSourceRef.value) {
+      eventSourceRef.value.close()
+      eventSourceRef.value = null
+    }
+
     // 使用流式输出（不需要传递 knowledge_base_ids，会话已经包含了）
     const eventSource = sendMessageStream(currentSessionId.value, {
       question
     })
+    eventSourceRef.value = eventSource
 
     let assistantMessage = null
+    let buffer = ''
+    let flushTimer = null
+
+    const ensureAssistantMessage = () => {
+      if (!assistantMessage) {
+        // 使用 reactive，确保后续属性修改是可响应的
+        assistantMessage = reactive({
+          id: Date.now() + 1,
+          role: 'assistant',
+          content: '',
+          sources: [],
+          created_at: new Date().toISOString()
+        })
+        messages.value.push(assistantMessage)
+      }
+    }
+
+    // 减少 DOM 抖动：缓冲内容，每 40ms 刷新一次
+    const flushBuffer = () => {
+      if (!assistantMessage || !buffer) return
+      assistantMessage.content += buffer
+      buffer = ''
+      scrollToBottom()
+    }
+
+    const scheduleFlush = () => {
+      if (flushTimer) return
+      flushTimer = setTimeout(() => {
+        flushTimer = null
+        flushBuffer()
+      }, 40)
+    }
 
     eventSource.onmessage = (event) => {
       const data = JSON.parse(event.data)
 
-      if (data.type === 'content') {
-        // 收到第一个内容时，立即隐藏loading并创建assistant消息
-        if (!assistantMessage) {
-          isLoading.value = false
-          assistantMessage = {
-            id: Date.now() + 1,
-            role: 'assistant',
-            content: '',
-            sources: [],
-            created_at: new Date().toISOString()
-          }
-          messages.value.push(assistantMessage)
-        }
-        assistantMessage.content += data.content
-        scrollToBottom()
+      if (data.type === 'start') {
+        ensureAssistantMessage()
+        isLoading.value = false
+      } else if (data.type === 'content') {
+        ensureAssistantMessage()
+        buffer += data.content || ''
+        scheduleFlush()
       } else if (data.type === 'sources') {
         if (assistantMessage) {
           assistantMessage.sources = data.sources
         }
       } else if (data.type === 'error') {
         eventSource.close()
+        eventSourceRef.value = null
         isLoading.value = false
+        flushBuffer()
         ElMessage.error('对话失败: ' + (data.error || '未知错误'))
       } else if (data.type === 'done') {
         eventSource.close()
+        eventSourceRef.value = null
+        flushBuffer()
         isLoading.value = false
       }
     }
@@ -373,7 +410,9 @@ const sendMessage = async () => {
     eventSource.onerror = (error) => {
       console.error('Stream error:', error)
       eventSource.close()
+      eventSourceRef.value = null
       isLoading.value = false
+      flushBuffer()
       ElMessage.error('发送失败')
     }
   } catch (error) {
@@ -419,6 +458,13 @@ const formatDateTime = (dateString) => {
 onMounted(() => {
   fetchSessions()
   fetchKnowledgeBases()
+})
+
+onBeforeUnmount(() => {
+  if (eventSourceRef.value) {
+    eventSourceRef.value.close()
+    eventSourceRef.value = null
+  }
 })
 </script>
 
