@@ -2,7 +2,7 @@
   <div class="chat-container">
     <el-container>
       <!-- 左侧会话列表 -->
-      <el-aside width="280px" class="session-sidebar">
+      <el-aside width="250px" class="session-sidebar">
         <div class="sidebar-header">
           <h3>对话历史</h3>
           <el-button type="primary" size="small" @click="createNewSession">
@@ -490,27 +490,36 @@ onBeforeUnmount(() => {
 <style scoped>
 .chat-container {
   height: calc(100vh - 120px);
-  background: white;
-  border-radius: 8px;
+  background: radial-gradient(120% 120% at 15% 10%, rgba(43, 104, 255, 0.08), transparent 55%),
+    radial-gradient(120% 120% at 85% 10%, rgba(17, 207, 161, 0.08), transparent 55%),
+    #f6f8fc;
+  border-radius: 18px;
   overflow: hidden;
-  /* 防止内容超出卡片区域 */
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  box-shadow: 0 16px 40px rgba(24, 53, 99, 0.12);
+  padding: 12px;
+  max-width: 1650px;
+  width: 100%;
+  margin: 0 auto;
+  box-sizing: border-box;
 }
 
 .chat-container :deep(.el-container) {
   height: 100%;
-  /* 确保容器占满父元素高度 */
+  border-radius: 14px;
+  overflow: hidden;
 }
 
 .session-sidebar {
-  border-right: 1px solid #e6e6e6;
+  border-right: 1px solid rgba(255, 255, 255, 0.18);
   display: flex;
   flex-direction: column;
+  background: linear-gradient(180deg, #2b3a55 0%, #253146 100%);
+  backdrop-filter: blur(10px);
 }
 
 .sidebar-header {
-  padding: 20px;
-  border-bottom: 1px solid #e6e6e6;
+  padding: 18px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -519,35 +528,37 @@ onBeforeUnmount(() => {
 .sidebar-header h3 {
   margin: 0;
   font-size: 16px;
+  color: #e9eef8;
 }
 
 .session-list {
   flex: 1;
-  padding: 10px;
+  padding: 12px;
 }
 
 .session-item {
   padding: 14px;
-  margin-bottom: 8px;
-  border-radius: 8px;
+  margin-bottom: 12px;
+  border-radius: 12px;
   cursor: pointer;
   display: flex;
   justify-content: space-between;
   align-items: center;
   transition: all 0.3s;
-  border: 1px solid transparent;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  background: rgba(255, 255, 255, 0.04);
+  color: #d7deeb;
 }
 
 .session-item:hover {
-  background-color: #f5f7fa;
-  border-color: #e6e6e6;
-  transform: translateX(4px);
+  background: rgba(255, 255, 255, 0.08);
+  transform: translateX(6px);
 }
 
 .session-item.active {
-  background-color: #ecf5ff;
-  border-color: #409EFF;
-  box-shadow: 0 2px 8px rgba(64, 158, 255, 0.2);
+  background: linear-gradient(120deg, rgba(43, 104, 255, 0.22), rgba(17, 207, 161, 0.18));
+  border-color: rgba(255, 255, 255, 0.18);
+  box-shadow: 0 12px 28px rgba(12, 40, 92, 0.28);
 }
 
 .session-info {
@@ -557,8 +568,8 @@ onBeforeUnmount(() => {
 
 .session-title {
   font-size: 14px;
-  font-weight: 500;
-  color: #333;
+  font-weight: 600;
+  color: #eef2fb;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -566,16 +577,16 @@ onBeforeUnmount(() => {
 }
 
 .session-item.active .session-title {
-  color: #409EFF;
+  color: #fff;
 }
 
 .session-time {
   font-size: 12px;
-  color: #999;
+  color: #a8b4c9;
 }
 
 .delete-icon {
-  color: #999;
+  color: #cfd5de;
   cursor: pointer;
   transition: all 0.3s;
   padding: 4px;
@@ -592,9 +603,8 @@ onBeforeUnmount(() => {
   display: flex;
   flex-direction: column;
   height: 100%;
-  /* 确保主区域占满高度 */
   overflow: hidden;
-  /* 防止主区域本身滚动 */
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.9), rgba(247, 248, 251, 0.92));
 }
 
 .empty-chat {
@@ -609,18 +619,21 @@ onBeforeUnmount(() => {
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  /* 确保内容不会超出容器 */
+  gap: 12px;
+  padding: 10px 12px;
 }
 
 /* 顶部标题栏样式 */
 .chat-header {
-  padding: 16px 20px 8px;
-  border-bottom: 1px solid #f0f0f0;
+  padding: 16px 18px 10px;
+  border-bottom: 1px solid #e8ebf2;
   display: flex;
   align-items: baseline;
   justify-content: space-between;
   flex-shrink: 0;
-  /* 防止标题栏被压缩 */
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 12px;
+  box-shadow: 0 10px 22px rgba(18, 63, 133, 0.08);
 }
 
 .chat-header-left {
@@ -663,10 +676,13 @@ onBeforeUnmount(() => {
 .message-list {
   flex: 1;
   overflow-y: auto;
-  /* 允许消息列表滚动 */
+  overflow-x: hidden;
   min-height: 0;
-  /* 确保 flex 子元素可以正确收缩 */
-  padding: 20px;
+  padding: 20px 16px;
+  background: white;
+  border-radius: 14px;
+  border: 1px solid #e8ebf2;
+  box-shadow: 0 12px 28px rgba(18, 63, 133, 0.08);
 }
 
 .message-item {
