@@ -1,791 +1,435 @@
-# RAG 知识库系统
+<div align="center">
 
-基于 Go + Python + Vue 的企业级 RAG（检索增强生成）知识库系统，提供智能文档管理与对话功能。
+# 🧠 RAG 知识库系统
 
-## 系统架构
+**企业级智能知识库解决方案**
 
-- **Go 后端服务** (`ragljx_go`): 使用 Gin + IOC 框架，提供 RESTful API，负责用户管理、知识库管理、文档管理、会话管理等
-- **Python AI 服务** (`ragljx_py`): 使用 gRPC，负责文档解析、向量化、RAG 对话等 AI 功能
-- **Vue 前端** (`ragljx_web`): 现代化的用户界面，提供知识库管理、文档上传、智能对话等功能
+基于 Go + Python + Vue 构建的 RAG（检索增强生成）知识库系统
 
-## 功能特性
+让您的文档"活"起来，与知识对话
 
-✅ **用户管理**
-- 用户注册、登录、JWT 认证
-- 基于角色的权限控制（RBAC）
-- 个人信息管理、密码修改
+[![Go Version](https://img.shields.io/badge/Go-1.21+-00ADD8?style=flat-square&logo=go)](https://golang.org/)
+[![Python Version](https://img.shields.io/badge/Python-3.12+-3776AB?style=flat-square&logo=python)](https://python.org/)
+[![Vue Version](https://img.shields.io/badge/Vue-3.x-4FC08D?style=flat-square&logo=vue.js)](https://vuejs.org/)
+[![License](https://img.shields.io/badge/License-MIT-green?style=flat-square)](LICENSE)
 
-✅ **知识库管理**
-- 创建、编辑、删除知识库
-- 自定义嵌入模型和分块策略
-- 知识库统计信息展示
+[功能特性](#-功能特性) • [快速开始](#-快速开始) • [系统架构](#-系统架构) • [技术栈](#-技术栈) • [文档](#-文档)
 
-✅ **文档管理**
-- 支持多种文档格式（TXT, MD, PDF, DOCX, XLSX, PPTX, HTML, CSV, JSON, XML, RTF）
-- 文档上传、自动解析、向量化
-- 文档状态跟踪、重新处理
+</div>
 
-✅ **智能对话**
-- 基于知识库的 RAG 对话
-- 流式输出，实时响应
-- 多知识库联合检索
-- 对话历史管理
-- 来源文档追溯
+---
 
-✅ **系统管理**
-- 用户管理（管理员功能）
-- 系统配置管理
-- 日志记录
+## 📖 项目简介
 
-## 技术栈
+RAG 知识库系统是一个开箱即用的企业级智能文档管理与对话系统。通过先进的检索增强生成（RAG）技术，将您的私有文档转化为可交互的知识库，实现精准的语义检索和智能问答。
 
-### 后端 (Go)
-- **Web 框架**: Gin
-- **ORM**: GORM
-- **依赖注入**: 自研 IOC 容器
-- **RPC**: gRPC 客户端
-- **数据库**: PostgreSQL
-- **缓存**: Redis
-- **消息队列**: Kafka (Redpanda)
-- **对象存储**: MinIO
-- **认证**: JWT
+### 🎯 适用场景
 
-### AI 服务 (Python)
-- **RPC 服务**: gRPC 服务器
-- **RAG 框架**: LlamaIndex
-- **向量数据库**: Qdrant
-- **LLM**: OpenAI API (GPT-4)
-- **嵌入模型**: OpenAI Embeddings
-- **文档解析**: 支持 12+ 种文档格式
+- 📚 **企业知识库** - 构建内部知识管理系统，让员工快速获取信息
+- 📋 **文档智能问答** - 上传产品手册、技术文档，实现智能客服
+- 🎓 **教育培训** - 构建课程资料库，辅助学习和培训
+- 🔬 **研究助手** - 管理论文、报告，快速检索相关内容
+- 💼 **合同/法务管理** - 智能检索合同条款和法律文件
 
-### 前端 (Vue)
-- **框架**: Vue 3 (Composition API)
-- **构建工具**: Vite
-- **UI 组件库**: Element Plus
-- **状态管理**: Pinia
-- **路由**: Vue Router
-- **HTTP 客户端**: Axios
-- **语言**: JavaScript
+---
 
-## 快速开始
+## ✨ 功能特性
 
-### 前置要求
+<table>
+<tr>
+<td width="50%">
 
-- **Docker & Docker Compose** (推荐使用 Docker 部署)
-- **Go 1.21+** (本地开发)
-- **Python 3.12+** (本地开发)
-- **Node.js 20+** (前端开发)
-- **OpenAI API Key** (必需，用于 AI 功能)
+### 🔐 用户管理
+- ✅ 用户注册、登录、JWT 认证
+- ✅ 基于角色的权限控制（RBAC）
+- ✅ 个人信息管理、密码修改
+- ✅ 管理员用户管理功能
 
-### 使用 Docker Compose 启动（推荐）
+</td>
+<td width="50%">
 
-1. **克隆项目并进入目录**：
-```bash
-cd /Users/liang/projectljx/ragljx
+### 📚 知识库管理
+- ✅ 创建、编辑、删除知识库
+- ✅ 自定义嵌入模型
+- ✅ 知识库统计信息展示
+- ✅ 多知识库隔离管理
+
+</td>
+</tr>
+<tr>
+<td width="50%">
+
+### 📄 文档管理
+- ✅ 支持 12+ 种文档格式
+- ✅ 自动文档解析与向量化
+- ✅ 文档状态实时跟踪
+- ✅ 批量上传、断点续传
+
+</td>
+<td width="50%">
+
+### 💬 智能对话
+- ✅ 基于 RAG 的精准问答
+- ✅ 流式输出，实时响应
+- ✅ 多知识库联合检索
+- ✅ 来源文档追溯引用
+
+</td>
+</tr>
+</table>
+
+### 📁 支持的文档格式
+
+| 类型 | 格式 |
+|------|------|
+| 📝 文本文件 | TXT, MD, RTF |
+| 📊 Office 文档 | DOCX, XLSX, PPTX |
+| 📕 PDF 文档 | PDF |
+| 🌐 网页文件 | HTML |
+| 📋 数据文件 | CSV, JSON, XML |
+
+---
+
+## 🏗 系统架构
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                         用户浏览器                               │
+│                    Vue 3 + Element Plus                         │
+└─────────────────────────────────────────────────────────────────┘
+                                │
+                                ▼ HTTP/SSE
+┌─────────────────────────────────────────────────────────────────┐
+│                      Go 后端服务 (8080)                          │
+│              Gin + GORM + JWT + IOC 容器                        │
+│    用户管理 │ 知识库管理 │ 文档管理 │ 会话管理                    │
+└─────────────────────────────────────────────────────────────────┘
+                                │
+                                ▼ gRPC
+┌─────────────────────────────────────────────────────────────────┐
+│                   Python AI 服务 (50051)                         │
+│              LlamaIndex + OpenAI API + gRPC                     │
+│    文档解析 │ 向量化 │ 语义检索 │ RAG 对话                       │
+└─────────────────────────────────────────────────────────────────┘
+                                │
+                                ▼
+┌─────────────────────────────────────────────────────────────────┐
+│                        基础设施层                                │
+│  ┌──────────┐ ┌──────────┐ ┌──────────┐ ┌──────────┐          │
+│  │PostgreSQL│ │  Qdrant  │ │  MinIO   │ │  Redis   │          │
+│  │ 业务数据  │ │ 向量存储  │ │ 文件存储  │ │   缓存   │          │
+│  └──────────┘ └──────────┘ └──────────┘ └──────────┘          │
+└─────────────────────────────────────────────────────────────────┘
 ```
 
-2. **配置环境变量**（必需）：
-```bash
-# 创建 .env 文件
-cat > .env << EOF
-OPENAI_API_KEY=your_openai_api_key_here
-OPENAI_API_BASE=https://api.openai.com/v1
-EOF
-```
+---
 
-3. **启动所有服务**：
+## 🛠 技术栈
+
+<table>
+<tr>
+<th align="center">层级</th>
+<th align="center">技术</th>
+<th align="center">说明</th>
+</tr>
+<tr>
+<td><b>🖥 前端</b></td>
+<td>Vue 3 + Vite + Element Plus + Pinia</td>
+<td>现代化响应式用户界面</td>
+</tr>
+<tr>
+<td><b>⚙️ 后端</b></td>
+<td>Go + Gin + GORM + gRPC</td>
+<td>高性能 RESTful API 服务</td>
+</tr>
+<tr>
+<td><b>🤖 AI 服务</b></td>
+<td>Python + LlamaIndex + gRPC</td>
+<td>文档处理与 RAG 引擎</td>
+</tr>
+<tr>
+<td><b>🗄 数据库</b></td>
+<td>PostgreSQL</td>
+<td>业务数据持久化存储</td>
+</tr>
+<tr>
+<td><b>🔍 向量库</b></td>
+<td>Qdrant</td>
+<td>高性能向量相似度检索</td>
+</tr>
+<tr>
+<td><b>📦 对象存储</b></td>
+<td>MinIO</td>
+<td>文档文件存储</td>
+</tr>
+<tr>
+<td><b>💾 缓存</b></td>
+<td>Redis</td>
+<td>会话缓存（预留）</td>
+</tr>
+</table>
+
+### 🤖 支持的 AI 模型
+
+**嵌入模型（文档向量化）**
+- OpenAI text-embedding-3-small / large
+- 兼容 OpenAI API 的第三方服务
+
+**对话模型（智能问答）**
+- OpenAI GPT-4 / GPT-3.5
+- DeepSeek (推荐，性价比高)
+- 通义千问、智谱 GLM、月之暗面等
+
+---
+
+## 🚀 快速开始
+
+### 📋 前置要求
+
+- **Docker & Docker Compose** v2.0+
+- **OpenAI 兼容的 API Key**（必需）
+
+### ⚡ 一键启动
+
 ```bash
+# 1. 克隆项目
+git clone https://github.com/your-username/ragljx.git
+cd ragljx
+
+# 2. 配置 API Key（必需）
+cp .env.example .env
+# 编辑 .env 文件，填入您的 API Key
+
+# 3. 启动所有服务
 docker-compose up -d
+
+# 4. 启动前端开发服务器
+cd ragljx_web && npm install && npm run dev
 ```
 
-这将启动以下服务：
-- PostgreSQL (数据库)
-- Redis (缓存)
-- Kafka/Redpanda (消息队列)
-- MinIO (对象存储)
-- Qdrant (向量数据库)
-- Go 后端服务
-- Python AI 服务
+### 🌐 访问系统
 
-4. **查看服务状态**：
-```bash
-docker-compose ps
+| 服务 | 地址 | 说明 |
+|------|------|------|
+| 🖥 前端界面 | http://localhost:5173 | 用户操作界面 |
+| 📡 后端 API | http://localhost:8080 | RESTful API |
+| 📦 MinIO 控制台 | http://localhost:9001 | 文件存储管理 |
+| 🔍 Qdrant 面板 | http://localhost:6333/dashboard | 向量数据库管理 |
+
+### 🔑 默认账号
+
 ```
-
-5. **查看日志**：
-```bash
-# 查看所有服务日志
-docker-compose logs -f
-
-# 查看特定服务日志
-docker-compose logs -f ragljx_go
-docker-compose logs -f ragljx_py
+用户名: admin
+密码: 123456
 ```
-
-6. **访问应用**：
-- 前端界面: http://localhost:5173 (开发模式)
-- 后端 API: http://localhost:8080
-- MinIO 控制台: http://localhost:9001
-- Qdrant 控制台: http://localhost:6333
-
-7. **默认登录账号**：
-- 用户名: `admin`
-- 密码: `123456`
 
 ⚠️ **首次登录后请立即修改密码！**
 
-### 本地开发
+> 📖 详细的启动说明请参阅 [启动指南.md](启动指南.md)
+>
+> 🔑 API Key 配置请参阅 [API_KEY_配置指南.md](API_KEY_配置指南.md)
 
-#### 1. Go 后端服务
+---
 
-```bash
-cd ragljx_go
+## 📖 使用指南
 
-# 安装依赖
-go mod tidy
+### 1️⃣ 创建知识库
 
-# 生成 proto 文件
-protoc --go_out=. --go_opt=paths=source_relative \
-  --go-grpc_out=. --go-grpc_opt=paths=source_relative \
-  proto/rag/rag_service.proto
+1. 登录系统，进入「知识库管理」
+2. 点击「创建知识库」
+3. 填写名称、英文标识（用于向量存储）、描述
+4. 选择嵌入模型，点击确定
 
-# 编译
-go build -o bin/ragljx cmd/server/main.go
+### 2️⃣ 上传文档
 
-# 运行（确保 PostgreSQL、Redis 等服务已启动）
-./bin/ragljx
-```
+1. 进入知识库，点击「上传文档」
+2. 选择文档文件（支持批量上传）
+3. 系统自动解析并向量化
+4. 等待状态变为「已完成」
 
-#### 2. Python AI 服务
+### 3️⃣ 智能对话
 
-```bash
-cd ragljx_py
+1. 进入「智能对话」页面
+2. 创建新对话，选择关联的知识库
+3. 输入问题，获取基于文档的智能回答
+4. 查看回答来源，验证信息准确性
 
-# 创建虚拟环境
-python3 -m venv venv
-source venv/bin/activate  # Linux/Mac
-# 或 venv\Scripts\activate  # Windows
+---
 
-# 安装依赖
-pip install -r requirements.txt
+## 📊 核心流程
 
-# 生成 proto 文件
-python3 -m grpc_tools.protoc -I. --python_out=. --grpc_python_out=. app/proto/rag_service.proto
-
-# 配置环境变量
-export OPENAI_API_KEY=your_api_key_here
-export OPENAI_API_BASE=https://api.openai.com/v1
-
-# 运行（确保 Qdrant 已启动）
-python main.py
-```
-
-#### 3. Vue 前端
-
-```bash
-cd ragljx_web
-
-# 安装依赖
-npm install
-
-# 启动开发服务器
-npm run dev
-
-# 构建生产版本
-npm run build
-
-# 预览生产版本
-npm run preview
-```
-
-前端开发服务器将在 http://localhost:5173 启动
-
-## 服务端口
-
-| 服务 | 端口 | 说明 | 访问地址 |
-|------|------|------|----------|
-| Vue 前端 | 5173 | 用户界面（开发模式） | http://localhost:5173 |
-| Go 后端 API | 8080 | RESTful API | http://localhost:8080 |
-| Python gRPC | 50051 | AI 服务 gRPC 接口 | - |
-| PostgreSQL | 5432 | 数据库 | - |
-| Redis | 6379 | 缓存 | - |
-| Kafka | 19092 | 消息队列 | - |
-| MinIO API | 9000 | 对象存储 API | http://localhost:9000 |
-| MinIO Console | 9001 | MinIO 管理界面 | http://localhost:9001 |
-| Qdrant API | 6333 | 向量数据库 API | http://localhost:6333 |
-| Qdrant Dashboard | 6334 | Qdrant 管理界面 | http://localhost:6334 |
-
-## 系统架构详解
-
-### 文档处理流程
+### 📄 文档处理流程
 
 ```
-用户上传文档
-    ↓
-Go 后端接收 (POST /api/v1/knowledge-bases/:id/documents/upload)
-    ├─ 计算文件 MD5 checksum
-    ├─ 保存到 MinIO 对象存储（bucket: ragljx）
-    ├─ 创建数据库记录（状态：parsing）
-    └─ 启动异步 goroutine
-         ↓
-    从 MinIO 下载文件内容
-         ↓
-    调用 Python gRPC 服务 ParseDocument()
-         ├─ 根据 MIME 类型选择解析器
-         ├─ 支持格式：PDF, DOCX, XLSX, PPTX, TXT, MD, HTML, CSV, JSON, XML, RTF
-         └─ 返回纯文本内容
-              ↓
-    调用 Python gRPC 服务 VectorizeDocument()
-         ├─ 使用 SentenceSplitter 分块（chunk_size=500, overlap=50）
-         ├─ 调用 OpenAI Embedding API 生成向量
-         ├─ Collection Name = kb.EnglishName（如：my_kb）
-         └─ 存储到 Qdrant 向量数据库
-              ↓
-    更新数据库状态（ready/failed）
+📤 用户上传文档
+       ↓
+⚙️ Go 后端接收
+   ├── 计算文件 SHA256
+   ├── 存储至 MinIO
+   └── 创建数据库记录
+       ↓
+🔄 异步处理 (goroutine)
+   ├── 从 MinIO 读取文件
+   └── 调用 Python gRPC
+       ↓
+📖 文档解析 (ParseDocument)
+   └── 提取纯文本内容
+       ↓
+🔢 向量化 (VectorizeDocument)
+   ├── 文本分块 (chunk_size=512)
+   ├── 调用 Embedding API
+   └── 存入 Qdrant
+       ↓
+✅ 更新状态为 completed
 ```
 
-**关键点**：
-- Collection Name 使用知识库的 `english_name` 字段
-- 每个文档分块后生成多个向量点，ID 格式：`{document_id}_{chunk_index}`
-- 向量维度：1536（text-embedding-3-small）
-- 距离度量：Cosine 相似度
-
-### 对话流程
+### 💬 RAG 对话流程
 
 ```
-用户发送问题
-    ↓
-Go 后端接收 (POST /api/v1/chat/sessions/:id/messages)
-    ├─ 验证 JWT Token
-    ├─ 获取会话配置（知识库 IDs、TopK、相似度阈值等）
-    ├─ 查询知识库的 english_name 列表
-    └─ 保存用户消息到数据库
-         ↓
-调用 Python gRPC 服务 Chat() 或 ChatStream()
-    ├─ 如果 use_rag=true：
-    │   ├─ 使用 Embedding 模型生成问题向量
-    │   ├─ 在 Qdrant 中检索相关文档片段（按 english_name 查询）
-    │   ├─ 按相似度排序并去重
-    │   └─ 构建 RAG 上下文
-    ├─ 构建 Prompt（系统提示 + RAG 上下文 + 历史对话 + 当前问题）
-    └─ 调用 LLM 生成回答（deepseek-chat）
-         ↓
-    返回回答 + 来源文档（包含 document_id, title, score, snippet）
-         ↓
-Go 后端保存助手消息到数据库
-    └─ 返回给前端
+❓ 用户提问
+       ↓
+🔐 JWT 认证
+       ↓
+🔍 语义检索
+   ├── 问题向量化
+   ├── Qdrant 相似度搜索
+   └── 获取相关文档片段
+       ↓
+📝 构建 Prompt
+   ├── 系统提示词
+   ├── RAG 上下文
+   └── 历史对话
+       ↓
+🤖 LLM 生成回答
+       ↓
+📚 返回答案 + 来源引用
 ```
 
-**关键点**：
-- 使用知识库的 `english_name` 作为 Qdrant collection name 进行检索
-- 支持多知识库联合检索（跨多个 collection）
-- 流式对话使用 SSE（Server-Sent Events）
-- Token 通过 query 参数传递（EventSource 不支持自定义 headers）
-
-## API 文档
-
-### 认证接口
-
-- `POST /api/v1/auth/login` - 用户登录
-- `POST /api/v1/auth/register` - 用户注册
-- `POST /api/v1/auth/logout` - 用户登出
-- `POST /api/v1/auth/refresh` - 刷新 Token
-- `GET /api/v1/auth/me` - 获取当前用户信息
-
-### 用户管理
-
-- `GET /api/v1/users` - 获取用户列表
-- `GET /api/v1/users/me` - 获取当前用户信息
-- `GET /api/v1/users/:id` - 获取用户详情
-- `POST /api/v1/users` - 创建用户
-- `PUT /api/v1/users/:id` - 更新用户
-- `PUT /api/v1/users/me/password` - 修改密码
-- `DELETE /api/v1/users/:id` - 删除用户
-
-### 知识库管理
-
-- `GET /api/v1/knowledge-bases` - 获取知识库列表
-- `GET /api/v1/knowledge-bases/:id` - 获取知识库详情
-- `POST /api/v1/knowledge-bases` - 创建知识库（需要 `name` 和 `english_name` 字段）
-- `PUT /api/v1/knowledge-bases/:id` - 更新知识库
-- `DELETE /api/v1/knowledge-bases/:id` - 删除知识库
-
-### 文档管理（嵌套路由）
-
-- `GET /api/v1/knowledge-bases/:kb_id/documents` - 获取文档列表
-- `GET /api/v1/knowledge-bases/:kb_id/documents/:doc_id` - 获取文档详情
-- `POST /api/v1/knowledge-bases/:kb_id/documents/upload` - 上传文档（自动解析和向量化）
-- `POST /api/v1/knowledge-bases/:kb_id/documents/:doc_id/vectorize` - 手动触发向量化
-- `DELETE /api/v1/knowledge-bases/:kb_id/documents/:doc_id` - 删除文档
-
-### 对话管理（嵌套路由）
-
-- `GET /api/v1/chat/sessions` - 获取会话列表
-- `GET /api/v1/chat/sessions/:id` - 获取会话详情
-- `GET /api/v1/chat/sessions/:id/messages` - 获取会话消息列表
-- `POST /api/v1/chat/sessions` - 创建会话
-- `POST /api/v1/chat/sessions/:id/messages` - 发送消息（非流式）
-- `GET /api/v1/chat/sessions/:id/messages/stream` - 发送消息（流式，SSE）
-- `PUT /api/v1/chat/sessions/:id` - 更新会话
-- `DELETE /api/v1/chat/sessions/:id` - 删除会话
-
-## 配置说明
-
-### Go 服务配置 (`ragljx_go/config/application.yaml`)
-
-```yaml
-http:
-  host: "0.0.0.0"
-  port: 8080
-  read_timeout: 60
-  write_timeout: 60
-
-postgres:
-  host: "localhost"
-  port: 5432
-  database: "ragljx"
-  username: "ragljx"
-  password: "ragljx_password"
-
-redis:
-  host: "localhost"
-  port: 6379
-  password: ""
-  db: 0
-
-# ... 其他配置
-```
-
-### Python 服务配置 (`ragljx_py/config.yaml`)
-
-```yaml
-grpc:
-  host: "0.0.0.0"
-  port: 50051
-
-qdrant:
-  host: "localhost"
-  port: 6333
-
-openai:
-  api_key: ""  # 从环境变量读取
-  api_base: "https://api.openai.com/v1"
-  embedding_model: "text-embedding-3-small"
-  chat_model: "gpt-4"
-
-# ... 其他配置
-```
-
-## 使用指南
-
-### 1. 创建知识库
-
-1. 登录系统后，进入"知识库管理"页面
-2. 点击"创建知识库"按钮
-3. 填写知识库信息：
-   - **名称**：知识库的中文名称（如：技术文档库）
-   - **英文标识**：唯一的英文标识符（如：tech_docs），只能包含小写字母、数字和下划线
-   - **描述**：知识库的描述信息（可选）
-   - **嵌入模型**：选择向量化模型（默认 text-embedding-3-small）
-   - **分块大小**：文档分块的大小（默认 500）
-   - **分块重叠**：分块之间的重叠大小（默认 50）
-4. 点击"确定"创建
-
-### 2. 上传文档
-
-1. 在知识库列表中，点击"查看文档"进入文档管理页面
-2. 点击"上传文档"按钮
-3. 选择要上传的文档（支持多文件上传）
-4. 系统会**自动异步处理**：
-   - 上传文件到 MinIO 对象存储
-   - 调用 Python gRPC 服务解析文档内容
-   - 调用 Python gRPC 服务进行向量化
-   - 存储向量到 Qdrant 数据库
-5. 等待文档状态变为"ready"（已完成）或"failed"（失败）
-
-**文档状态说明**：
-- `parsing` - 正在解析和向量化
-- `ready` - 已完成，可用于检索
-- `failed` - 处理失败，查看错误信息
-
-### 3. 智能对话
-
-1. 进入"智能对话"页面
-2. 点击"新对话"创建一个对话会话
-3. 选择要检索的知识库（可多选）
-4. 在输入框中输入问题
-5. 系统会基于选中的知识库进行检索并生成回答
-6. 回答下方会显示参考来源文档
-
-### 4. 用户管理（管理员）
-
-1. 管理员用户可以进入"用户管理"页面
-2. 可以创建、编辑、删除用户
-3. 可以管理用户的角色和权限
-
-## 数据库迁移
-
-数据库表会在首次启动时自动创建（通过 `migrations/*.sql` 文件）。
-
-### 默认管理员账号
-
-系统会自动创建一个默认的超级管理员账号：
-
-- **用户名**: `admin`
-- **密码**: `123456`
-- **邮箱**: `admin@ragljx.com`
-
-⚠️ **重要提示**: 请在生产环境中立即修改默认密码！
-
-### 工具脚本
-
-#### 生成密码哈希
-
-用于生成 bcrypt 密码哈希，可用于直接在数据库中更新密码：
-
-```bash
-cd ragljx_go
-go run scripts/gen_password/main.go your_new_password
-```
-
-输出示例：
-```
-Password: your_new_password
-Bcrypt Hash: $2a$10$xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-Verification: OK
-```
-
-#### 测试配置加载
-
-用于测试配置文件是否正确加载：
-
-```bash
-cd ragljx_go
-go run scripts/test_config/main.go
-```
-
-这将显示所有配置项的值，帮助您验证配置是否正确。
-
-## 开发注意事项
-
-### 1. OpenAI API 配置
-
-**必须配置有效的 OpenAI API Key 才能使用 AI 功能**
-
-- 通过环境变量设置：`export OPENAI_API_KEY=your_key_here`
-- 或在 Python 服务配置文件中设置
-- 支持自定义 API Base URL（如使用代理或第三方服务）
-
-### 2. 模型选择
-
-**嵌入模型**（用于向量化）：
-- `text-embedding-3-small` - 推荐，性价比高
-- `text-embedding-3-large` - 更高精度
-- `text-embedding-ada-002` - 旧版模型
-
-**对话模型**（用于生成回答）：
-- `gpt-4` - 默认，质量最高
-- `gpt-3.5-turbo` - 更快，成本更低
-- 可在 Python 服务配置文件中修改
-
-### 3. 文件限制
-
-- **前端上传限制**：50MB
-- **gRPC 消息大小限制**：100MB
-- **支持的文档格式**：
-  - 文本文件：TXT, MD
-  - Office 文档：DOCX, XLSX, PPTX
-  - PDF 文档：PDF
-  - 网页文件：HTML
-  - 数据文件：CSV, JSON, XML
-  - 其他：RTF
-
-### 4. 路由和认证
-
-**RESTful API 设计**：
-- 使用嵌套路由：`/knowledge-bases/:id/documents`
-- 所有 API 需要 JWT 认证（除登录/注册）
-- Token 存储在 `localStorage`
-
-**JWT Token**：
-- Access Token 有效期：24 小时
-- Refresh Token 有效期：7 天
-- 自动刷新机制
-
-### 5. IOC 容器和路由注册
-
-**初始化顺序**（按 Priority 值）：
-1. Config 对象（priority 99）- 配置加载
-2. HTTP Server（priority 800）- 创建 Gin 引擎，注册全局中间件
-3. API 对象（priority -99）- 在 `Init()` 中调用 `Registry()` 注册路由
-
-**中间件注册**：
-- CORS、日志、恢复等中间件在 HTTP Server 的 `Init()` 中注册
-- 必须在路由注册之前完成
-
-### 6. 文档处理机制
-
-**异步处理**：
-- 上传后立即返回，后台异步处理
-- 使用 goroutine 调用 Python gRPC 服务
-- 实时更新数据库状态
-
-**状态流转**：
-```
-pending → parsing → ready
-                 ↘ failed
-```
-
-**错误处理**：
-- 解析失败或向量化失败会更新状态为 `failed`
-- 错误信息存储在数据库中
-- 用户可以查看详细错误信息
-
-## 故障排查
-
-### 前端无法访问
-
-**问题**: 访问 http://localhost:5173 无响应
-
-**解决方案**:
-```bash
-cd ragljx_web
-npm install
-npm run dev
-```
-
-### Go 服务无法连接数据库
-
-**问题**: Go 服务启动失败，提示数据库连接错误
-
-**解决方案**:
-- 检查 PostgreSQL 是否启动：`docker-compose ps postgres`
-- 检查数据库配置是否正确（`ragljx_go/config/application.yaml`）
-- 查看日志：`docker-compose logs postgres`
-- 确保数据库端口 5432 未被占用
-
-### Python 服务无法连接 Qdrant
-
-**问题**: Python 服务启动失败，提示 Qdrant 连接错误
-
-**解决方案**:
-- 检查 Qdrant 是否启动：`docker-compose ps qdrant`
-- 访问 Qdrant Dashboard: http://localhost:6334
-- 查看日志：`docker-compose logs qdrant`
-
-### gRPC 连接失败
-
-**问题**: Go 服务提示无法连接 Python gRPC 服务
-
-**解决方案**:
-- 确保 Python 服务已启动：`docker-compose ps ragljx_py`
-- 检查端口 50051 是否被占用：`lsof -i :50051`
-- 查看 Python 服务日志：`docker-compose logs ragljx_py`
-
-### OpenAI API 调用失败
-
-**问题**: 对话功能无法使用，提示 API 错误
-
-**解决方案**:
-- 检查 OpenAI API Key 是否正确配置
-- 检查 API Key 是否有效且有余额
-- 检查网络是否能访问 OpenAI API
-- 查看 Python 服务日志：`docker-compose logs ragljx_py`
-
-### 文档上传失败
-
-**问题**: 文档上传后状态一直是"parsing"或变成"failed"
-
-**解决方案**:
-1. **检查文件格式**：确保文件格式在支持列表中
-2. **检查文件大小**：不超过 50MB
-3. **查看 Go 服务日志**：
-   ```bash
-   docker-compose logs -f ragljx_go
-   ```
-4. **查看 Python 服务日志**：
-   ```bash
-   docker-compose logs -f ragljx_py
-   ```
-5. **检查 gRPC 连接**：
-   - 确保 Python 服务在 50051 端口运行
-   - 检查网络连接：`telnet localhost 50051`
-6. **检查 MinIO**：
-   ```bash
-   docker-compose ps minio
-   docker-compose logs minio
-   ```
-7. **检查 Qdrant**：
-   ```bash
-   docker-compose ps qdrant
-   # 访问 Qdrant Dashboard
-   open http://localhost:6334
-   ```
-8. **检查 OpenAI API**：
-   - 确保 API Key 有效
-   - 确保有足够余额
-   - 检查网络能否访问 OpenAI API
-
-### 前端登录后立即跳转到登录页
-
-**问题**: 登录成功后又跳转回登录页
-
-**解决方案**:
-- 检查浏览器控制台是否有错误
-- 检查后端 API 是否正常返回 Token
-- 清除浏览器 localStorage：`localStorage.clear()`
-- 检查后端 CORS 配置
-
-### 对话失败或无回复
-
-**问题**: 对话时提示错误或无法获取回答
-
-**解决方案**:
-1. **检查 Python 服务**：
-   ```bash
-   docker-compose logs -f ragljx_py
-   # 或本地运行
-   ps aux | grep python
-   ```
-2. **检查 gRPC 连接**：
-   ```bash
-   telnet localhost 50051
-   # 或
-   nc -zv localhost 50051
-   ```
-3. **检查知识库配置**：
-   - 确保会话关联的知识库存在
-   - 确保知识库有 `english_name` 字段
-   - 确保知识库中有状态为 `ready` 的文档
-4. **检查 Qdrant Collection**：
-   ```bash
-   # 访问 Qdrant Dashboard
-   open http://localhost:6334
-   # 检查 collection 是否存在，名称应该是知识库的 english_name
-   ```
-5. **检查 OpenAI API**：
-   - 验证 API Key 有效
-   - 验证余额充足
-   - 检查网络连接
-6. **常见错误**：
-   - `collection not found`: 知识库没有文档或文档未向量化
-   - `invalid token`: JWT Token 过期或无效
-   - `knowledge base not found`: 知识库 ID 错误或已删除
-   - `failed to get knowledge base collection names`: 知识库缺少 `english_name` 字段
-
-## 测试检查清单
-
-### 文档上传测试
-
-1. **创建知识库**：
-   - 填写名称和 **english_name**（必填！）
-   - 记录知识库 ID
-
-2. **上传文档**：
-   - 选择支持的文件格式
-   - 观察状态变化：`parsing` → `ready` 或 `failed`
-
-3. **检查 Qdrant**：
-   ```bash
-   # 访问 Qdrant Dashboard
-   open http://localhost:6334
-   # 查看 collections，应该有名为 {english_name} 的 collection
-   ```
-
-4. **检查日志**：
-   ```bash
-   # Go 服务日志
-   tail -f ragljx/ragljx_go/logs/app.log
-
-   # Python 服务日志
-   tail -f ragljx/ragljx_py/logs/app.log
-   ```
-
-### 对话测试
-
-1. **创建会话**：
-   - 选择知识库
-   - 启用 RAG
-   - 设置 TopK 和相似度阈值
-
-2. **发送消息**：
-   - 测试非流式对话
-   - 测试流式对话
-   - 检查是否返回来源文档
-
-3. **验证检索**：
-   - 查看返回的 `rag_sources`
-   - 确认 `document_id`、`title`、`score` 字段正确
-
-### 常见问题自查
-
-- [ ] 所有基础设施服务正常运行（PostgreSQL, Redis, Kafka, MinIO, Qdrant）
-- [ ] Python gRPC 服务在 50051 端口运行
-- [ ] Go 后端服务在 8080 端口运行
-- [ ] 知识库有 `english_name` 字段
-- [ ] 文档状态为 `ready`
-- [ ] Qdrant 中存在对应的 collection
-- [ ] OpenAI API Key 有效且有余额
-- [ ] 网络可以访问 OpenAI API
-
-## 停止服务
-
-```bash
-# 停止所有服务
-docker-compose down
-
-# 停止并删除数据卷（谨慎使用，会删除所有数据）
-docker-compose down -v
-
-# 停止特定服务
-docker-compose stop ragljx_go
-docker-compose stop ragljx_py
-```
-
-## 项目结构
+---
+
+## 📡 API 接口
+
+### 🔐 认证相关
+| 方法 | 路径 | 说明 |
+|------|------|------|
+| POST | `/api/v1/auth/login` | 用户登录 |
+| POST | `/api/v1/auth/register` | 用户注册 |
+| POST | `/api/v1/auth/refresh` | 刷新 Token |
+
+### 📚 知识库管理
+| 方法 | 路径 | 说明 |
+|------|------|------|
+| GET | `/api/v1/knowledge-bases` | 获取知识库列表 |
+| POST | `/api/v1/knowledge-bases` | 创建知识库 |
+| PUT | `/api/v1/knowledge-bases/:id` | 更新知识库 |
+| DELETE | `/api/v1/knowledge-bases/:id` | 删除知识库 |
+
+### 📄 文档管理
+| 方法 | 路径 | 说明 |
+|------|------|------|
+| GET | `/api/v1/knowledge-bases/:id/documents` | 获取文档列表 |
+| POST | `/api/v1/knowledge-bases/:id/documents/upload` | 上传文档 |
+| DELETE | `/api/v1/knowledge-bases/:id/documents/:docId` | 删除文档 |
+
+### 💬 对话管理
+| 方法 | 路径 | 说明 |
+|------|------|------|
+| GET | `/api/v1/chat/sessions` | 获取会话列表 |
+| POST | `/api/v1/chat/sessions` | 创建会话 |
+| GET | `/api/v1/chat/sessions/:id/messages/stream` | 流式对话 (SSE) |
+
+---
+
+## 📁 项目结构
 
 ```
 ragljx/
-├── ragljx_go/              # Go 后端服务
-│   ├── cmd/                # 命令行入口
-│   ├── config/             # 配置文件
-│   ├── internal/           # 内部代码
-│   │   ├── api/           # API 控制器
-│   │   ├── middleware/    # 中间件
-│   │   ├── model/         # 数据模型
-│   │   ├── repository/    # 数据访问层
-│   │   ├── service/       # 业务逻辑层
-│   │   └── pkg/           # 工具包
-│   ├── ioc/               # IOC 容器
-│   ├── migrations/        # 数据库迁移
-│   └── proto/             # Proto 文件
-├── ragljx_py/             # Python AI 服务
-│   ├── app/               # 应用代码
-│   │   ├── grpc_server/  # gRPC 服务器
-│   │   ├── services/     # 业务服务
-│   │   ├── utils/        # 工具函数
-│   │   └── proto/        # Proto 文件
-│   ├── config.yaml        # 配置文件
-│   ├── main.py           # 入口文件
-│   └── requirements.txt   # Python 依赖
-├── ragljx_web/            # Vue 前端
+├── 📂 ragljx_go/              # Go 后端服务
+│   ├── cmd/server/           # 应用入口
+│   ├── config/               # 配置文件
+│   ├── internal/
+│   │   ├── api/             # API 控制器
+│   │   ├── middleware/      # 中间件
+│   │   ├── model/           # 数据模型
+│   │   ├── repository/      # 数据访问层
+│   │   └── service/         # 业务逻辑层
+│   ├── ioc/                  # IOC 容器
+│   └── migrations/           # 数据库迁移
+│
+├── 📂 ragljx_py/              # Python AI 服务
+│   ├── app/
+│   │   ├── grpc_server/     # gRPC 服务
+│   │   ├── services/        # 业务服务
+│   │   └── proto/           # Proto 定义
+│   ├── config.yaml           # 配置文件
+│   └── main.py               # 入口文件
+│
+├── 📂 ragljx_web/             # Vue 前端
 │   ├── src/
-│   │   ├── api/          # API 封装
-│   │   ├── components/   # 组件
-│   │   ├── layouts/      # 布局
-│   │   ├── router/       # 路由
-│   │   ├── stores/       # 状态管理
-│   │   ├── utils/        # 工具函数
-│   │   ├── views/        # 页面
-│   │   ├── App.vue       # 根组件
-│   │   └── main.js       # 入口文件
-│   ├── public/           # 静态资源
-│   └── package.json      # 依赖配置
-├── docker-compose.yml     # Docker 编排
-└── README.md             # 项目文档
+│   │   ├── api/             # API 封装
+│   │   ├── components/      # 组件
+│   │   ├── views/           # 页面
+│   │   ├── router/          # 路由
+│   │   └── stores/          # 状态管理
+│   └── package.json
+│
+├── 📄 docker-compose.yml      # 完整部署配置
+├── 📄 docker-compose.infra.yml # 基础设施配置
+├── 📄 start_go.sh             # Go 服务启动脚本
+├── 📄 start_python.sh         # Python 服务启动脚本
+└── 📄 .env                    # 环境变量配置
 ```
 
-## 贡献指南
+---
+
+## ❓ 常见问题
+
+<details>
+<summary><b>Q: 文档上传后一直显示"处理中"？</b></summary>
+
+检查以下几点：
+1. Python AI 服务是否正常运行
+2. API Key 是否配置正确
+3. 查看 Python 服务日志：`docker-compose logs ragljx_py`
+</details>
+
+<details>
+<summary><b>Q: 对话无法获取回答？</b></summary>
+
+1. 确认知识库中有已处理完成的文档
+2. 检查对话模型 API Key 是否有效
+3. 检查网络是否能访问 AI 服务
+</details>
+
+<details>
+<summary><b>Q: 如何降低使用成本？</b></summary>
+
+1. 对话模型使用 DeepSeek（约 OpenAI 的 1/10 价格）
+2. 嵌入模型使用 text-embedding-3-small
+3. 调整 RAG 参数减少 token 使用
+</details>
+
+<details>
+<summary><b>Q: 支持私有化部署吗？</b></summary>
+
+完全支持！系统设计为本地部署，所有数据存储在您自己的服务器上。
+</details>
+
+---
+
+## 🛑 停止服务
+
+```bash
+# 停止所有 Docker 服务
+docker-compose down
+
+# 停止并删除数据（谨慎使用）
+docker-compose down -v
+```
+
+---
+
+## 🤝 贡献指南
 
 欢迎贡献代码！请遵循以下步骤：
 
@@ -795,11 +439,27 @@ ragljx/
 4. 推送到分支 (`git push origin feature/AmazingFeature`)
 5. 开启 Pull Request
 
-## 许可证
+---
 
-MIT License
+## 📄 许可证
 
-## 联系方式
+本项目采用 [MIT License](LICENSE) 开源许可证。
 
-如有问题或建议，请提交 Issue。
+---
 
+## 📞 联系方式
+
+如有问题或建议，请通过以下方式联系：
+
+- 📧 提交 [Issue](../../issues)
+- 💬 发起 [Discussion](../../discussions)
+
+---
+
+<div align="center">
+
+**⭐ 如果这个项目对你有帮助，请给一个 Star！**
+
+Made with ❤️ by RAG Knowledge Base Team
+
+</div>

@@ -1,16 +1,51 @@
-# API Key 配置指南
+<div align="center">
+
+# 🔑 API Key 配置指南
+
+**为 RAG 知识库系统配置 AI 模型**
+
+</div>
+
+---
+
+## 📋 目录
+
+- [概述](#-概述)
+- [方式一：Docker 全容器启动配置](#-方式一docker-全容器启动配置)
+- [方式二：本地开发启动配置](#-方式二本地开发启动配置)
+- [支持的服务提供商](#-支持的服务提供商)
+- [常见问题](#-常见问题)
+
+---
+
+## 📖 概述
 
 本系统使用两个独立的 AI 模型：
-1. **嵌入模型（Embedding Model）**：用于文档向量化
-2. **对话模型（Chat Model）**：用于 AI 对话
 
-您可以为这两个模型配置不同的 API Key 和服务提供商。
+| 模型类型 | 用途 | 推荐服务 |
+|---------|------|---------|
+| 🔢 **嵌入模型** | 文档向量化 | OpenAI text-embedding-3-small |
+| 💬 **对话模型** | 智能问答 | DeepSeek / OpenAI GPT-4 |
 
-## 📝 配置步骤
+> 💡 **提示**：两个模型可以使用不同的服务提供商，灵活搭配以优化成本和效果。
 
-### 1. 编辑 `.env` 文件
+---
 
-在项目根目录 `/Users/liang/projectljx/ragljx/.env` 中配置：
+## 🐳 方式一：Docker 全容器启动配置
+
+> 使用 `docker-compose.yml` 启动所有服务时的配置方法
+
+### 步骤 1：创建 .env 文件
+
+```bash
+# 进入项目根目录
+cd ragljx
+
+# 复制模板文件
+cp .env.example .env
+```
+
+### 步骤 2：编辑 .env 文件
 
 ```bash
 # ========================================
@@ -26,23 +61,105 @@ EMBEDDING_MODEL=text-embedding-3-small
 CHAT_API_KEY=your_chat_api_key_here
 CHAT_API_BASE=https://api.openai.com/v1
 CHAT_MODEL=gpt-4
-
-# ========================================
-# 模型参数配置
-# ========================================
-CHAT_TEMPERATURE=0.7
-CHAT_MAX_TOKENS=2000
 ```
 
-### 2. 替换 API Key
+### 步骤 3：启动服务
 
-将 `your_embedding_api_key_here` 和 `your_chat_api_key_here` 替换为您的真实 API Key。
-
-**如果使用同一个 OpenAI 账号**，两个 Key 可以相同：
 ```bash
-EMBEDDING_API_KEY=sk-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-CHAT_API_KEY=sk-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+# 启动所有容器
+docker-compose up -d
+
+# 验证配置是否生效
+docker-compose logs ragljx_py | grep "initialized"
 ```
+
+**预期输出**：
+
+```
+VectorService initialized with Qdrant at qdrant:6333
+Using embedding model: text-embedding-3-small
+ChatService initialized with model: gpt-4
+```
+
+### 🔧 配置原理
+
+`docker-compose.yml` 中的 Python 服务会读取 `.env` 文件中的环境变量：
+
+```yaml
+ragljx_py:
+  environment:
+    EMBEDDING_API_KEY: ${EMBEDDING_API_KEY:-}
+    EMBEDDING_API_BASE: ${EMBEDDING_API_BASE:-https://api.openai.com/v1}
+    EMBEDDING_MODEL: ${EMBEDDING_MODEL:-text-embedding-3-small}
+    CHAT_API_KEY: ${CHAT_API_KEY:-}
+    CHAT_API_BASE: ${CHAT_API_BASE:-https://api.openai.com/v1}
+    CHAT_MODEL: ${CHAT_MODEL:-gpt-4}
+```
+
+---
+
+## 💻 方式二：本地开发启动配置
+
+> 使用 `docker-compose.infra.yml` + 本地服务时的配置方法
+
+### 步骤 1：创建 .env 文件
+
+```bash
+# 进入项目根目录
+cd ragljx
+
+# 复制模板文件
+cp .env.example .env
+```
+
+### 步骤 2：编辑 .env 文件
+
+```bash
+# ========================================
+# 嵌入模型配置（用于文档向量化）
+# ========================================
+EMBEDDING_API_KEY=your_embedding_api_key_here
+EMBEDDING_API_BASE=https://api.openai.com/v1
+EMBEDDING_MODEL=text-embedding-3-small
+
+# ========================================
+# 对话模型配置（用于 AI 对话）
+# ========================================
+CHAT_API_KEY=your_chat_api_key_here
+CHAT_API_BASE=https://api.openai.com/v1
+CHAT_MODEL=gpt-4
+```
+
+### 步骤 3：启动 Python 服务
+
+```bash
+# 运行启动脚本（会自动读取 .env 文件）
+./start_python.sh
+```
+
+**预期输出**：
+
+```
+VectorService initialized with Qdrant at localhost:6333
+Using embedding model: text-embedding-3-small
+ChatService initialized with model: gpt-4
+```
+
+### 🔧 配置原理
+
+`start_python.sh` 脚本会自动读取项目根目录的 `.env` 文件：
+
+```bash
+# start_python.sh 中的关键代码
+if [ -f "../.env" ]; then
+    set -a
+    source "../.env"
+    set +a
+    echo "✅ 已加载 .env 配置文件"
+fi
+```
+
+---
 
 ## 🌐 支持的服务提供商
 
@@ -170,89 +287,93 @@ CHAT_MODEL=moonshot-v1-8k
 - 对话：100 × 500 / 1000 × (¥0.001 + ¥0.002) / 7 = $0.02
 - **总计：约 $0.03**
 
-## 🔧 测试配置
+---
 
-配置完成后，可以通过以下方式测试：
+## ✅ 验证配置
 
-### 1. 测试 Python 服务启动
-
-```bash
-cd /Users/liang/projectljx/ragljx/ragljx_py
-
-# 设置环境变量
-export EMBEDDING_API_KEY="your_key"
-export CHAT_API_KEY="your_key"
-
-# 启动服务
-python main.py
-```
-
-查看日志，应该看到：
-```
-VectorService initialized with Qdrant at localhost:6333
-Using embedding model: text-embedding-3-small
-ChatService initialized with model: gpt-4
-```
-
-### 2. 使用 Docker Compose
+### 方式一验证（Docker 全容器）
 
 ```bash
-cd /Users/liang/projectljx/ragljx
-
-# 启动服务
-docker-compose up -d
-
 # 查看 Python 服务日志
-docker-compose logs -f ragljx_py
+docker-compose logs ragljx_py | grep -E "(initialized|model)"
 ```
 
-## ⚠️ 常见问题
+### 方式二验证（本地开发）
 
-### Q1: 两个 API Key 必须不同吗？
+```bash
+# 启动 Python 服务后查看输出
+./start_python.sh
+```
 
-**A**: 不必须。如果使用同一个 OpenAI 账号，两个 Key 可以相同。
+**成功标志**：
 
-### Q2: 可以只配置一个 Key 吗？
+```
+✅ VectorService initialized with Qdrant at localhost:6333
+✅ Using embedding model: text-embedding-3-small
+✅ ChatService initialized with model: deepseek-chat
+✅ RAG gRPC server started on 0.0.0.0:50051
+```
 
-**A**: 不可以。系统需要两个模型都正常工作。但两个 Key 可以相同。
+---
 
-### Q3: 嵌入模型可以用国内大模型吗？
+## ❓ 常见问题
 
-**A**: 理论上可以，但需要确保：
+<details>
+<summary><b>Q1: 两个 API Key 必须不同吗？</b></summary>
+
+不必须。如果使用同一个 OpenAI 账号，两个 Key 可以相同。
+</details>
+
+<details>
+<summary><b>Q2: 可以只配置一个 Key 吗？</b></summary>
+
+不可以。系统需要嵌入模型和对话模型都正常工作。但两个 Key 可以相同。
+</details>
+
+<details>
+<summary><b>Q3: 嵌入模型可以用国内大模型吗？</b></summary>
+
+理论上可以，但需要确保：
 1. 该服务提供嵌入 API
 2. API 格式兼容 OpenAI
 3. 向量维度一致（默认 1536）
 
 建议嵌入模型使用 OpenAI，对话模型可以灵活选择。
+</details>
 
-### Q4: 如何降低成本？
+<details>
+<summary><b>Q4: 如何降低成本？</b></summary>
 
-**A**: 
-1. 对话模型改用 gpt-3.5-turbo 或国内大模型
-2. 减少 CHAT_MAX_TOKENS（默认 2000）
-3. 提高 CHAT_TEMPERATURE 可能减少 token 使用
+1. 对话模型改用 DeepSeek（约 OpenAI 的 1/100 价格）
+2. 嵌入模型使用 text-embedding-3-small
+3. 减少 RAG 检索的 TopK 值
+</details>
 
-### Q5: API Key 安全吗？
+<details>
+<summary><b>Q5: API Key 安全吗？</b></summary>
 
-**A**: 
 - `.env` 文件已在 `.gitignore` 中，不会提交到 Git
 - Docker 容器中的环境变量是隔离的
 - 建议定期轮换 API Key
-- 在 OpenAI 控制台设置使用限额
+- 在服务商控制台设置使用限额
+</details>
+
+---
 
 ## 📚 相关文档
 
-- [OpenAI API 文档](https://platform.openai.com/docs/api-reference)
-- [DeepSeek API 文档](https://platform.deepseek.com/api-docs/)
-- [通义千问 API 文档](https://help.aliyun.com/zh/dashscope/)
-- [智谱 AI API 文档](https://open.bigmodel.cn/dev/api)
+| 服务商 | 文档链接 |
+|--------|---------|
+| OpenAI | [API 文档](https://platform.openai.com/docs/api-reference) |
+| DeepSeek | [API 文档](https://platform.deepseek.com/api-docs/) |
+| 通义千问 | [API 文档](https://help.aliyun.com/zh/dashscope/) |
+| 智谱 AI | [API 文档](https://open.bigmodel.cn/dev/api) |
+| 月之暗面 | [API 文档](https://platform.moonshot.cn/docs) |
 
-## 🆘 获取帮助
+---
 
-如果配置过程中遇到问题：
+<div align="center">
 
-1. 检查 API Key 是否正确
-2. 检查 API Base URL 是否正确
-3. 查看服务日志：`docker-compose logs ragljx_py`
-4. 测试 API 连接：`curl -H "Authorization: Bearer YOUR_KEY" https://api.openai.com/v1/models`
+**🔑 配置完成后，请返回 [启动指南.md](启动指南.md) 继续启动服务**
 
+</div>
