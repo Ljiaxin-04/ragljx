@@ -37,7 +37,7 @@ RAG 知识库系统是一个开箱即用的企业级智能文档管理与对话�
 
 <table>
 <tr>
-<td align="center"><b>📊 系统首页</b></td>
+<td align="center"><b>📊 登陆首页</b></td>
 <td align="center"><b>📚 知识库管理</b></td>
 </tr>
 <tr>
