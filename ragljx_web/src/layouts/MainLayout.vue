@@ -1,9 +1,9 @@
 <template>
   <el-container class="main-layout">
     <!-- 侧边栏 -->
-    <el-aside :width="isCollapse ? '64px' : '200px'" class="sidebar">
+    <el-aside :width="isCollapse ? '64px' : '220px'" class="sidebar">
       <div class="logo">
-        <span v-if="!isCollapse">RAG 系统</span>
+        <span v-if="!isCollapse">RAG 知识库</span>
         <span v-else>R</span>
       </div>
       
@@ -12,9 +12,9 @@
         :collapse="isCollapse"
         :router="true"
         class="sidebar-menu"
-        background-color="#304156"
-        text-color="#bfcbd9"
-        active-text-color="#409EFF"
+        background-color="#223047"
+        text-color="#cdd6e4"
+        active-text-color="var(--ui-accent)"
       >
         <el-menu-item index="/knowledge">
           <el-icon><Collection /></el-icon>
@@ -129,9 +129,11 @@ const handleCommand = (command) => {
 }
 
 .sidebar {
-  background-color: #304156;
+  background: linear-gradient(180deg, #1d2740 0%, #1a2135 100%);
   transition: width 0.3s;
   overflow-x: hidden;
+  border-right: 1px solid #202a42;
+  box-shadow: inset -1px 0 0 rgba(255, 255, 255, 0.04);
 }
 
 .logo {
@@ -142,12 +144,14 @@ const handleCommand = (command) => {
   font-size: 20px;
   font-weight: bold;
   color: white;
-  background-color: #2b3a4a;
+  letter-spacing: 1px;
+  background: linear-gradient(90deg, rgba(43, 104, 255, 0.25), rgba(17, 207, 161, 0.25));
 }
 
 .sidebar-menu {
   border-right: none;
   height: calc(100vh - 60px);
+  padding-top: 6px;
 }
 
 .header {
@@ -155,8 +159,9 @@ const handleCommand = (command) => {
   justify-content: space-between;
   align-items: center;
   background-color: white;
-  border-bottom: 1px solid #e6e6e6;
+  border-bottom: 1px solid var(--ui-border);
   padding: 0 20px;
+  box-shadow: var(--ui-shadow);
 }
 
 .header-left {
@@ -172,7 +177,7 @@ const handleCommand = (command) => {
 }
 
 .collapse-icon:hover {
-  color: #409EFF;
+  color: var(--ui-primary);
 }
 
 .header-right {
@@ -191,12 +196,12 @@ const handleCommand = (command) => {
 }
 
 .user-info:hover {
-  background-color: #f5f5f5;
+  background-color: #eef2f9;
 }
 
 .username {
   font-size: 14px;
-  color: #333;
+  color: var(--ui-text);
 }
 
 .main-content {
@@ -216,4 +221,3 @@ const handleCommand = (command) => {
   opacity: 0;
 }
 </style>
-

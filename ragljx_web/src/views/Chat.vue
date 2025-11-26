@@ -697,78 +697,87 @@ onBeforeUnmount(() => {
 
 .message-content {
   max-width: 75%;
-  max-height: 400px;
-  /* 限制单个消息的最大高度，避免占据过多空间 */
+  max-height: 480px;
   overflow-y: auto;
-  padding: 14px 18px;
-  border-radius: 12px;
-  background-color: #f5f7fa;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
-  transition: all 0.3s;
+  padding: 16px 18px;
+  border-radius: 16px;
+  background-color: #f6f8fc;
+  box-shadow: 0 10px 24px rgba(23, 57, 107, 0.08);
+  transition: all 0.25s ease;
 }
 
 .message-content:hover {
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 12px 30px rgba(23, 57, 107, 0.12);
 }
 
 .message-item.user .message-content {
-  background: linear-gradient(135deg, #409EFF 0%, #66b1ff 100%);
+  background: linear-gradient(135deg, #2b68ff 0%, #5f8bff 100%);
   color: white;
 }
 
 .message-text {
   line-height: 1.8;
   word-break: break-word;
-  font-size: 14px;
+  font-size: 15px;
+  color: var(--ui-text);
 }
 
 .message-item.user .message-text {
   color: white;
 }
 
+.card {
+  background: white;
+  border: 1px solid var(--ui-border);
+  border-radius: 14px;
+  box-shadow: var(--ui-shadow);
+}
+
 .message-sources {
-  margin-top: 12px;
-  padding: 10px;
-  background-color: rgba(64, 158, 255, 0.05);
-  border-radius: 6px;
-  border-left: 3px solid #409EFF;
+  margin-top: 14px;
+  padding: 12px;
 }
 
 .sources-title {
   font-size: 13px;
-  font-weight: 600;
-  color: #409EFF;
-  margin-bottom: 10px;
-}
-
-.source-item {
-  margin-bottom: 8px;
-  padding: 8px;
-  background-color: white;
-  border-radius: 4px;
-  transition: all 0.3s;
-}
-
-.source-item:hover {
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  transform: translateX(2px);
-}
-
-.source-item:last-child {
-  margin-bottom: 0;
-}
-
-.source-info {
+  font-weight: 700;
+  color: var(--ui-text);
+  margin-bottom: 12px;
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   gap: 8px;
 }
 
-.source-icon {
-  color: #409EFF;
-  font-size: 16px;
-  margin-top: 2px;
-  flex-shrink: 0;
+.source-grid {
+  display: grid;
+  gap: 10px;
+}
+
+.source-item {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 10px;
+  align-items: center;
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: #f7f9ff;
+  border: 1px solid #e4e9f5;
+  transition: all 0.2s;
+}
+
+.source-item:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 8px 18px rgba(24, 72, 160, 0.08);
+}
+
+.source-icon-wrap {
+  width: 32px;
+  height: 32px;
+  border-radius: 10px;
+  background: rgba(43, 104, 255, 0.08);
+  display: grid;
+  place-items: center;
+  color: var(--ui-primary);
 }
 
 .source-text {
@@ -778,28 +787,29 @@ onBeforeUnmount(() => {
 
 .source-name {
   font-size: 13px;
-  color: #333;
-  font-weight: 500;
+  color: var(--ui-text);
+  font-weight: 600;
   margin-bottom: 4px;
   word-break: break-all;
 }
 
 .source-score {
   font-size: 12px;
-  color: #67C23A;
-  font-weight: 500;
+  color: var(--ui-accent);
+  font-weight: 600;
 }
 
 .typing-indicator {
   display: flex;
   gap: 4px;
+  margin-top: 6px;
 }
 
 .typing-indicator span {
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  background-color: #409EFF;
+  background-color: #2b68ff;
   animation: typing 1.4s infinite;
 }
 
@@ -825,11 +835,10 @@ onBeforeUnmount(() => {
 }
 
 .input-area {
-  padding: 16px 20px;
-  border-top: 1px solid #e6e6e6;
-  background-color: #fafafa;
+  padding: 16px 18px;
+  border-top: 1px solid var(--ui-border);
+  background-color: transparent;
   flex-shrink: 0;
-  /* 防止输入框被压缩 */
 }
 
 .input-wrapper {
@@ -843,16 +852,16 @@ onBeforeUnmount(() => {
 }
 
 .message-input :deep(.el-textarea__inner) {
-  border-radius: 8px;
-  border: 2px solid #e6e6e6;
+  border-radius: 12px;
+  border: 2px solid #e7ecf5;
   transition: all 0.3s;
   font-size: 14px;
   line-height: 1.6;
 }
 
 .message-input :deep(.el-textarea__inner):focus {
-  border-color: #409EFF;
-  box-shadow: 0 0 0 2px rgba(64, 158, 255, 0.1);
+  border-color: var(--ui-primary);
+  box-shadow: 0 0 0 3px rgba(43, 104, 255, 0.12);
 }
 
 .message-input :deep(.el-textarea__inner):disabled {

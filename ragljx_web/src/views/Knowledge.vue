@@ -1,8 +1,12 @@
 <template>
   <div class="knowledge-container">
     <div class="page-header">
-      <h2>知识库管理</h2>
-      <el-button type="primary" @click="showCreateDialog">
+      <div>
+        <div class="eyebrow">知识空间</div>
+        <h2>知识库管理</h2>
+        <p class="subtitle">管理你的业务文档与向量配置</p>
+      </div>
+      <el-button type="primary" round @click="showCreateDialog">
         <el-icon><Plus /></el-icon>
         创建知识库
       </el-button>
@@ -22,8 +26,14 @@
         >
           <el-card class="kb-card" shadow="hover">
             <div class="kb-header">
-              <el-icon class="kb-icon"><Collection /></el-icon>
-              <h3 class="kb-name">{{ kb.name }}</h3>
+              <div class="kb-icon-pill">
+                <el-icon><Collection /></el-icon>
+              </div>
+              <div class="kb-title-block">
+                <h3 class="kb-name">{{ kb.name }}</h3>
+                <div class="kb-sub">{{ kb.english_name }}</div>
+              </div>
+              <el-tag type="success" effect="plain" size="small">运行中</el-tag>
             </div>
             
             <p class="kb-description">{{ kb.description || '暂无描述' }}</p>
@@ -40,13 +50,13 @@
             </div>
             
             <div class="kb-actions">
-              <el-button type="primary" size="small" @click="goToDocuments(kb.id)">
+              <el-button type="primary" size="small" round @click="goToDocuments(kb.id)">
                 查看文档
               </el-button>
-              <el-button size="small" @click="showEditDialog(kb)">
+              <el-button size="small" round @click="showEditDialog(kb)">
                 编辑
               </el-button>
-              <el-button type="danger" size="small" @click="handleDelete(kb)">
+              <el-button type="danger" size="small" round plain @click="handleDelete(kb)">
                 删除
               </el-button>
             </div>
@@ -274,8 +284,20 @@ onMounted(() => {
 
 .page-header h2 {
   margin: 0;
-  font-size: 24px;
-  color: #333;
+  font-size: 26px;
+  color: var(--ui-text);
+}
+
+.subtitle {
+  margin: 6px 0 0 0;
+  color: var(--ui-subtext);
+  font-size: 13px;
+}
+
+.eyebrow {
+  font-size: 12px;
+  color: var(--ui-subtext);
+  letter-spacing: 0.6px;
 }
 
 .knowledge-list {
@@ -284,11 +306,16 @@ onMounted(() => {
 
 .kb-card {
   margin-bottom: 20px;
-  transition: transform 0.3s;
+  transition: transform 0.3s, box-shadow 0.3s;
+  border-radius: 16px;
+  border: 1px solid var(--ui-border);
+  box-shadow: var(--ui-shadow);
+  background: linear-gradient(180deg, rgba(43, 104, 255, 0.03), rgba(17, 207, 161, 0.02) 60%, #fff 100%);
 }
 
 .kb-card:hover {
-  transform: translateY(-5px);
+  transform: translateY(-6px);
+  box-shadow: 0 14px 34px rgba(19, 54, 109, 0.14);
 }
 
 .kb-header {
@@ -298,23 +325,40 @@ onMounted(() => {
   margin-bottom: 15px;
 }
 
-.kb-icon {
-  font-size: 32px;
-  color: #409EFF;
+.kb-icon-pill {
+  width: 44px;
+  height: 44px;
+  border-radius: 14px;
+  background: rgba(43, 104, 255, 0.1);
+  display: grid;
+  place-items: center;
+  color: var(--ui-primary);
+  font-size: 22px;
 }
 
 .kb-name {
   margin: 0;
   font-size: 18px;
-  color: #333;
+  color: var(--ui-text);
   flex: 1;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
+.kb-title-block {
+  flex: 1;
+  min-width: 0;
+}
+
+.kb-sub {
+  font-size: 12px;
+  color: var(--ui-subtext);
+  margin-top: 4px;
+}
+
 .kb-description {
-  color: #666;
+  color: #4a5568;
   font-size: 14px;
   margin: 0 0 15px 0;
   min-height: 40px;
@@ -329,7 +373,7 @@ onMounted(() => {
   gap: 15px;
   margin-bottom: 15px;
   padding-top: 15px;
-  border-top: 1px solid #eee;
+  border-top: 1px solid var(--ui-border);
 }
 
 .stat-item {
@@ -337,7 +381,7 @@ onMounted(() => {
   align-items: center;
   gap: 5px;
   font-size: 13px;
-  color: #999;
+  color: var(--ui-subtext);
 }
 
 .kb-actions {
@@ -349,4 +393,3 @@ onMounted(() => {
   flex: 1;
 }
 </style>
-
