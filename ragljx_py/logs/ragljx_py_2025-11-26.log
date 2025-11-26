@@ -129,3 +129,13 @@
 2025-11-26 16:28:34.630 | INFO     | app.services.vector_service:query:288 - Query collection my_redis_student returned 0 results
 2025-11-26 16:28:34.630 | INFO     | app.services.chat_service:retrieve_documents:57 - No results from my_redis_student with threshold 0.699999988079071, retrying without threshold
 2025-11-26 16:28:35.660 | INFO     | app.services.vector_service:query:288 - Query collection my_redis_student returned 2 results
+2025-11-26 17:16:14.116 | INFO     | app.grpc_server.rag_servicer:ChatStream:164 - Chat stream request: reids数据结构有哪些？... use_rag=True
+2025-11-26 17:16:16.504 | INFO     | app.services.vector_service:query:288 - Query collection my_redis_student returned 0 results
+2025-11-26 17:16:16.505 | INFO     | app.services.chat_service:retrieve_documents:57 - No results from my_redis_student with threshold 0.699999988079071, retrying without threshold
+2025-11-26 17:16:17.521 | INFO     | app.services.vector_service:query:288 - Query collection my_redis_student returned 2 results
+2025-11-26 17:16:18.544 | INFO     | app.services.vector_service:query:288 - Query collection my_golang returned 0 results
+2025-11-26 17:16:18.545 | INFO     | app.services.chat_service:retrieve_documents:57 - No results from my_golang with threshold 0.699999988079071, retrying without threshold
+2025-11-26 17:16:19.594 | INFO     | app.services.vector_service:query:288 - Query collection my_golang returned 3 results
+2025-11-26 17:16:20.624 | INFO     | app.services.vector_service:query:288 - Query collection liangjiaxin_ceshi returned 0 results
+2025-11-26 17:16:20.625 | INFO     | app.services.chat_service:retrieve_documents:57 - No results from liangjiaxin_ceshi with threshold 0.699999988079071, retrying without threshold
+2025-11-26 17:16:21.627 | INFO     | app.services.vector_service:query:288 - Query collection liangjiaxin_ceshi returned 5 results

@@ -460,8 +460,16 @@ const formatMessage = (content) => {
 
 const formatDateTime = (dateString) => {
   if (!dateString) return ''
-  const date = new Date(dateString)
+
+  // 如果时间字符串没有时区信息，假设后端返回的是 UTC 时间，添加 'Z' 后缀
+  let normalizedDateString = dateString
+  if (!dateString.endsWith('Z') && !dateString.includes('+') && !dateString.includes('-', 10)) {
+    normalizedDateString = dateString + 'Z'
+  }
+
+  const date = new Date(normalizedDateString)
   if (isNaN(date.getTime())) return ''
+
   // 统一显示为 UTC+8（北京时间）
   return date.toLocaleString('zh-CN', {
     hour12: false,
