@@ -60,7 +60,7 @@
           <el-scrollbar ref="scrollbarRef" class="message-list">
             <div v-for="message in messages" :key="message.id" :class="['message-item', message.role]">
               <div class="message-avatar">
-                <el-avatar v-if="message.role === 'user'" :size="36">
+                <el-avatar v-if="message.role === 'user'" :size="36" :src="userAvatar">
                   {{ userStore.nickname.charAt(0) }}
                 </el-avatar>
                 <el-icon v-else :size="36" color="#409EFF">
@@ -160,6 +160,7 @@ import {
 const userStore = useUserStore()
 const chatStore = useChatStore()
 const knowledgeStore = useKnowledgeStore()
+const userAvatar = computed(() => userStore.avatar)
 
 const sessions = ref([])
 const currentSessionId = ref(null)

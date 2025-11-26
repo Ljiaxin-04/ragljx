@@ -2,6 +2,7 @@
   <el-container class="main-layout">
     <!-- 侧边栏 -->
     <el-aside :width="isCollapse ? '64px' : '220px'" class="sidebar">
+      <div class="sidebar-glow"></div>
       <div class="logo">
         <span v-if="!isCollapse">RAG 知识库</span>
         <span v-else>R</span>
@@ -12,7 +13,7 @@
         :collapse="isCollapse"
         :router="true"
         class="sidebar-menu"
-        background-color="#223047"
+        background-color="transparent"
         text-color="#cdd6e4"
         active-text-color="var(--ui-accent)"
       >
@@ -134,6 +135,17 @@ const handleCommand = (command) => {
   overflow-x: hidden;
   border-right: 1px solid #202a42;
   box-shadow: inset -1px 0 0 rgba(255, 255, 255, 0.04);
+  position: relative;
+  overflow: hidden;
+}
+
+.sidebar-glow {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(60% 40% at 20% 10%, rgba(43, 104, 255, 0.18), transparent 60%),
+    radial-gradient(50% 30% at 80% 5%, rgba(17, 207, 161, 0.14), transparent 55%);
+  opacity: 0.9;
+  pointer-events: none;
 }
 
 .logo {
@@ -146,12 +158,33 @@ const handleCommand = (command) => {
   color: white;
   letter-spacing: 1px;
   background: linear-gradient(90deg, rgba(43, 104, 255, 0.25), rgba(17, 207, 161, 0.25));
+  position: relative;
+  overflow: hidden;
 }
 
 .sidebar-menu {
   border-right: none;
   height: calc(100vh - 60px);
   padding-top: 6px;
+  background: transparent;
+}
+
+.sidebar-menu :deep(.el-menu-item) {
+  transition: all 0.3s ease;
+  border-radius: 12px;
+  margin: 4px 10px;
+  padding-left: 16px !important;
+}
+
+.sidebar-menu :deep(.el-menu-item:hover) {
+  background: linear-gradient(90deg, rgba(43, 104, 255, 0.12), rgba(17, 207, 161, 0.12));
+  transform: translateX(4px);
+}
+
+.sidebar-menu :deep(.is-active) {
+  background: linear-gradient(120deg, rgba(43, 104, 255, 0.2), rgba(17, 207, 161, 0.2));
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 0 10px 20px rgba(12, 40, 92, 0.25);
 }
 
 .header {
@@ -202,6 +235,15 @@ const handleCommand = (command) => {
 .username {
   font-size: 14px;
   color: var(--ui-text);
+}
+
+/* Sidebar item icon color tweak */
+.sidebar-menu :deep(.el-menu-item [class^="el-icon"]) {
+  color: #cdd6e4;
+}
+
+.sidebar-menu :deep(.is-active [class^="el-icon"]) {
+  color: var(--ui-accent);
 }
 
 .main-content {

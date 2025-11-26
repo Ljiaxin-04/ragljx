@@ -1,4 +1,5 @@
 import { defineStore } from 'pinia'
+import adminAvatar from '@/picture/admin.JPG'
 import { login, logout, getCurrentUser } from '@/api/auth'
 import router from '@/router'
 
@@ -13,7 +14,7 @@ export const useUserStore = defineStore('user', {
     isLoggedIn: (state) => !!state.token,
     username: (state) => state.userInfo?.username || '',
     nickname: (state) => state.userInfo?.nickname || state.userInfo?.username || '',
-    avatar: (state) => state.userInfo?.avatar || '',
+    avatar: (state) => state.userInfo?.avatar || adminAvatar,
     roles: (state) => state.userInfo?.roles || [],
     isAdmin: (state) => state.userInfo?.roles?.some(role => role.name === 'admin') || false
   },
@@ -86,4 +87,3 @@ export const useUserStore = defineStore('user', {
     }
   }
 })
-
