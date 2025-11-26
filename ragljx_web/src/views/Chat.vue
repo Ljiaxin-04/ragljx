@@ -36,24 +36,21 @@
         </div>
 
         <div v-else class="chat-content">
-          <!-- 顶部标题和会话信息 -->
-          <div class="chat-header">
+          <!-- 顶部标题和知识库选择（合并为一行） -->
+          <div class="chat-header-compact">
             <div class="chat-header-left">
-              <div class="chat-title">
-                {{ currentSessionTitle }}
-              </div>
+              <div class="chat-title">{{ currentSessionTitle }}</div>
               <div class="chat-subtitle">
                 {{ selectedKnowledgeBases.length > 0 ? '已启用知识库问答（RAG）' : '纯模型对话' }}
               </div>
             </div>
-          </div>
-
-          <!-- 知识库选择 -->
-          <div class="kb-selector">
-            <span>选择知识库：</span>
-            <el-select v-model="selectedKnowledgeBases" multiple placeholder="请选择知识库" style="width: 400px">
-              <el-option v-for="kb in knowledgeBases" :key="kb.id" :label="kb.name" :value="kb.id" />
-            </el-select>
+            <div class="kb-selector-inline">
+              <span>选择知识库：</span>
+              <el-select v-model="selectedKnowledgeBases" multiple placeholder="请选择知识库" size="small"
+                style="min-width: 200px; max-width: 350px">
+                <el-option v-for="kb in knowledgeBases" :key="kb.id" :label="kb.name" :value="kb.id" />
+              </el-select>
+            </div>
           </div>
 
           <!-- 消息列表 -->
@@ -110,29 +107,27 @@
           </el-scrollbar>
 
           <!-- 输入框 -->
-          <div class="input-area">
-            <div class="input-wrapper">
-              <el-input v-model="inputMessage" type="textarea" :rows="3"
+          <div class="input-area-compact">
+            <div class="input-row">
+              <el-input v-model="inputMessage" type="textarea" :rows="2" :autosize="{ minRows: 2, maxRows: 4 }"
                 :placeholder="selectedKnowledgeBases.length === 0 ? '请先选择知识库...' : '输入您的问题，按 Enter 发送，Shift + Enter 换行...'"
                 @keydown.enter.exact.prevent="sendMessage" :disabled="selectedKnowledgeBases.length === 0"
-                class="message-input" />
-              <div class="input-actions">
-                <div class="input-hint">
-                  <el-icon>
-                    <InfoFilled />
-                  </el-icon>
-                  <span v-if="selectedKnowledgeBases.length === 0">请先选择知识库</span>
-                  <span v-else>按 Enter 发送，Shift + Enter 换行</span>
-                </div>
-                <el-button type="primary" :loading="isLoading"
-                  :disabled="!inputMessage.trim() || selectedKnowledgeBases.length === 0" @click="sendMessage"
-                  size="large">
-                  <el-icon>
-                    <Promotion />
-                  </el-icon>
-                  {{ isLoading ? '发送中...' : '发送' }}
-                </el-button>
-              </div>
+                class="message-input-compact" />
+              <el-button type="primary" :loading="isLoading"
+                :disabled="!inputMessage.trim() || selectedKnowledgeBases.length === 0" @click="sendMessage"
+                class="send-btn">
+                <el-icon>
+                  <Promotion />
+                </el-icon>
+                {{ isLoading ? '发送中' : '发送' }}
+              </el-button>
+            </div>
+            <div class="input-hint-compact">
+              <el-icon>
+                <InfoFilled />
+              </el-icon>
+              <span v-if="selectedKnowledgeBases.length === 0">请先选择知识库</span>
+              <span v-else>按 Enter 发送，Shift + Enter 换行</span>
             </div>
           </div>
         </div>
@@ -619,55 +614,55 @@ onBeforeUnmount(() => {
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  gap: 12px;
-  padding: 10px 12px;
+  gap: 8px;
+  padding: 8px 12px;
 }
 
-/* 顶部标题栏样式 */
-.chat-header {
-  padding: 16px 18px 10px;
-  border-bottom: 1px solid #e8ebf2;
+/* 紧凑的顶部标题栏和知识库选择（合并为一行） */
+.chat-header-compact {
+  padding: 10px 16px;
   display: flex;
-  align-items: baseline;
+  align-items: center;
   justify-content: space-between;
   flex-shrink: 0;
-  background: rgba(255, 255, 255, 0.9);
-  border-radius: 12px;
-  box-shadow: 0 10px 22px rgba(18, 63, 133, 0.08);
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(18, 63, 133, 0.06);
+  gap: 16px;
+  flex-wrap: wrap;
 }
 
 .chat-header-left {
   display: flex;
   flex-direction: column;
+  min-width: 0;
 }
 
 .chat-title {
-  font-size: 16px;
+  font-size: 15px;
   font-weight: 600;
   color: #303133;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .chat-subtitle {
-  margin-top: 4px;
-  font-size: 12px;
+  margin-top: 2px;
+  font-size: 11px;
   color: #909399;
 }
 
-/* 优化消息区域的留白和行距 - 已移至下方统一定义 */
-
-.kb-selector {
-  padding: 16px 20px;
-  border-bottom: 1px solid #e6e6e6;
-  background-color: #fafafa;
+/* 内联知识库选择器 */
+.kb-selector-inline {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 8px;
   flex-shrink: 0;
-  /* 防止知识库选择器被压缩 */
 }
 
-.kb-selector span {
-  font-size: 14px;
+.kb-selector-inline span {
+  font-size: 13px;
   font-weight: 500;
   color: #606266;
   white-space: nowrap;
@@ -678,17 +673,17 @@ onBeforeUnmount(() => {
   overflow-y: auto;
   overflow-x: hidden;
   min-height: 0;
-  padding: 20px 16px;
+  padding: 16px 14px;
   background: white;
-  border-radius: 14px;
+  border-radius: 12px;
   border: 1px solid #e8ebf2;
-  box-shadow: 0 12px 28px rgba(18, 63, 133, 0.08);
+  box-shadow: 0 8px 20px rgba(18, 63, 133, 0.06);
 }
 
 .message-item {
   display: flex;
-  gap: 12px;
-  margin-bottom: 24px;
+  gap: 10px;
+  margin-bottom: 18px;
   animation: fadeIn 0.3s ease-in;
 }
 
@@ -851,56 +846,64 @@ onBeforeUnmount(() => {
   }
 }
 
-.input-area {
-  padding: 16px 18px;
-  border-top: 1px solid var(--ui-border);
-  background-color: transparent;
+/* 紧凑的输入区域 */
+.input-area-compact {
+  padding: 10px 12px;
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(18, 63, 133, 0.06);
   flex-shrink: 0;
 }
 
-.input-wrapper {
+.input-row {
   display: flex;
-  flex-direction: column;
-  gap: 12px;
+  gap: 10px;
+  align-items: flex-end;
 }
 
-.message-input {
-  width: 100%;
+.message-input-compact {
+  flex: 1;
 }
 
-.message-input :deep(.el-textarea__inner) {
-  border-radius: 12px;
-  border: 2px solid #e7ecf5;
+.message-input-compact :deep(.el-textarea__inner) {
+  border-radius: 10px;
+  border: 1.5px solid #e7ecf5;
   transition: all 0.3s;
   font-size: 14px;
-  line-height: 1.6;
+  line-height: 1.5;
+  padding: 10px 14px;
+  resize: none;
 }
 
-.message-input :deep(.el-textarea__inner):focus {
+.message-input-compact :deep(.el-textarea__inner):focus {
   border-color: var(--ui-primary);
-  box-shadow: 0 0 0 3px rgba(43, 104, 255, 0.12);
+  box-shadow: 0 0 0 2px rgba(43, 104, 255, 0.1);
 }
 
-.message-input :deep(.el-textarea__inner):disabled {
+.message-input-compact :deep(.el-textarea__inner):disabled {
   background-color: #f5f5f5;
   cursor: not-allowed;
 }
 
-.input-actions {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.input-hint {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 12px;
-  color: #909399;
-}
-
-.input-hint .el-icon {
+.send-btn {
+  height: 44px;
+  min-width: 90px;
+  border-radius: 10px;
   font-size: 14px;
+  font-weight: 500;
+}
+
+.input-hint-compact {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  color: #909399;
+  margin-top: 6px;
+  padding-left: 2px;
+}
+
+.input-hint-compact .el-icon {
+  font-size: 12px;
 }
 </style>
