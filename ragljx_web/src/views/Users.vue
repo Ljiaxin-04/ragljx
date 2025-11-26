@@ -15,7 +15,11 @@
         style="width: 100%"
       >
         <el-table-column prop="username" label="用户名" width="150" />
-        <el-table-column prop="nickname" label="昵称" width="150" />
+        <el-table-column label="昵称" width="150">
+          <template #default="{ row }">
+            {{ row.real_name || '-' }}
+          </template>
+        </el-table-column>
         <el-table-column prop="email" label="邮箱" width="200" />
         
         <el-table-column label="角色" width="200">
@@ -99,8 +103,8 @@
           />
         </el-form-item>
         
-        <el-form-item label="昵称" prop="nickname">
-          <el-input v-model="form.nickname" placeholder="请输入昵称" />
+        <el-form-item label="昵称" prop="real_name">
+          <el-input v-model="form.real_name" placeholder="请输入昵称" />
         </el-form-item>
         
         <el-form-item label="邮箱" prop="email">
@@ -160,7 +164,7 @@ const editingId = ref(null)
 
 const form = reactive({
   username: '',
-  nickname: '',
+  real_name: '',
   email: '',
   password: '',
   status: 'active'
@@ -209,7 +213,7 @@ const showEditDialog = (user) => {
   dialogTitle.value = '编辑用户'
   editingId.value = user.id
   form.username = user.username
-  form.nickname = user.nickname
+  form.real_name = user.real_name
   form.email = user.email
   form.status = user.status
   form.password = ''
@@ -218,7 +222,7 @@ const showEditDialog = (user) => {
 
 const resetForm = () => {
   form.username = ''
-  form.nickname = ''
+  form.real_name = ''
   form.email = ''
   form.password = ''
   form.status = 'active'
@@ -233,14 +237,21 @@ const handleSubmit = async () => {
       try {
         if (editingId.value) {
           const updateData = {
-            nickname: form.nickname,
+            real_name: form.real_name,
             email: form.email,
             status: form.status
           }
           await updateUser(editingId.value, updateData)
           ElMessage.success('更新成功')
         } else {
-          await createUser(form)
+          const payload = {
+            username: form.username,
+            real_name: form.real_name,
+            email: form.email,
+            password: form.password,
+            status: form.status
+          }
+          await createUser(payload)
           ElMessage.success('创建成功')
         }
         dialogVisible.value = false
@@ -309,4 +320,3 @@ onMounted(() => {
   justify-content: flex-end;
 }
 </style>
-
