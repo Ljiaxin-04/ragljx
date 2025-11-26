@@ -90,20 +90,22 @@
             </div>
 
             <!-- 加载中 -->
-            <div v-if="isLoading" class="message-item assistant">
-              <div class="message-avatar">
-                <el-icon :size="36" color="#409EFF">
-                  <ChatDotRound />
-                </el-icon>
-              </div>
-              <div class="message-content">
-                <div class="typing-indicator">
-                  <span></span>
-                  <span></span>
-                  <span></span>
+            <transition name="loading-fade">
+              <div v-if="isLoading" class="message-item assistant loading-message">
+                <div class="message-avatar">
+                  <el-icon :size="36" color="#409EFF">
+                    <ChatDotRound />
+                  </el-icon>
+                </div>
+                <div class="message-content">
+                  <div class="typing-indicator">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                  </div>
                 </div>
               </div>
-            </div>
+            </transition>
           </el-scrollbar>
 
           <!-- 输入框 -->
@@ -395,17 +397,24 @@ const sendMessage = async () => {
       const data = JSON.parse(event.data)
 
       if (data.type === 'start') {
+        // 先创建消息，再关闭 loading，避免头像闪烁
         ensureAssistantMessage()
-        isLoading.value = false
+        nextTick(() => {
+          isLoading.value = false
+        })
       } else if (data.type === 'content') {
+        // 先确保消息存在，再关闭 loading
         ensureAssistantMessage()
-        // 若后台未发送 start 事件，第一次内容也能关闭 loading
-        isLoading.value = false
         buffer += data.content || ''
         scheduleFlush()
+        // 延迟关闭 loading，确保 DOM 已更新
+        if (isLoading.value) {
+          nextTick(() => {
+            isLoading.value = false
+          })
+        }
       } else if (data.type === 'sources') {
         pendingSources = data.sources || []
-        isLoading.value = false
       } else if (data.type === 'error') {
         eventSource.close()
         eventSourceRef.value = null
@@ -692,18 +701,42 @@ onBeforeUnmount(() => {
   display: flex;
   gap: 10px;
   margin-bottom: 18px;
-  animation: fadeIn 0.3s ease-in;
+  animation: fadeIn 0.25s ease-out;
+}
+
+/* 加载中的消息项使用更柔和的动画 */
+.message-item.loading-message {
+  animation: fadeIn 0.2s ease-out;
 }
 
 @keyframes fadeIn {
   from {
     opacity: 0;
-    transform: translateY(10px);
+    transform: translateY(6px);
   }
 
   to {
     opacity: 1;
     transform: translateY(0);
+  }
+}
+
+/* 加载消息的过渡动画 */
+.loading-fade-enter-active {
+  animation: fadeIn 0.2s ease-out;
+}
+
+.loading-fade-leave-active {
+  animation: fadeOut 0.15s ease-in;
+}
+
+@keyframes fadeOut {
+  from {
+    opacity: 1;
+  }
+
+  to {
+    opacity: 0;
   }
 }
 

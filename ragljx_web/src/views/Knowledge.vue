@@ -7,27 +7,24 @@
         <p class="subtitle">管理你的业务文档与向量配置</p>
       </div>
       <el-button type="primary" round @click="showCreateDialog">
-        <el-icon><Plus /></el-icon>
+        <el-icon>
+          <Plus />
+        </el-icon>
         创建知识库
       </el-button>
     </div>
-    
+
     <div v-loading="loading" class="knowledge-list">
       <el-empty v-if="!loading && knowledgeBases.length === 0" description="暂无知识库，请创建一个" />
-      
+
       <el-row :gutter="20">
-        <el-col
-          v-for="kb in knowledgeBases"
-          :key="kb.id"
-          :xs="24"
-          :sm="12"
-          :md="8"
-          :lg="6"
-        >
+        <el-col v-for="kb in knowledgeBases" :key="kb.id" :xs="24" :sm="12" :md="8" :lg="6">
           <el-card class="kb-card" shadow="hover">
             <div class="kb-header">
               <div class="kb-icon-pill">
-                <el-icon><Collection /></el-icon>
+                <el-icon>
+                  <Collection />
+                </el-icon>
               </div>
               <div class="kb-title-block">
                 <h3 class="kb-name">{{ kb.name }}</h3>
@@ -35,20 +32,24 @@
               </div>
               <el-tag type="success" effect="plain" size="small">运行中</el-tag>
             </div>
-            
+
             <p class="kb-description">{{ kb.description || '暂无描述' }}</p>
-            
+
             <div class="kb-stats">
               <div class="stat-item">
-                <el-icon><Document /></el-icon>
+                <el-icon>
+                  <Document />
+                </el-icon>
                 <span>{{ kb.document_count || 0 }} 个文档</span>
               </div>
               <div class="stat-item">
-                <el-icon><Clock /></el-icon>
+                <el-icon>
+                  <Clock />
+                </el-icon>
                 <span>{{ formatDate(kb.created_at) }}</span>
               </div>
             </div>
-            
+
             <div class="kb-actions">
               <el-button type="primary" size="small" round @click="goToDocuments(kb.id)">
                 查看文档
@@ -64,21 +65,11 @@
         </el-col>
       </el-row>
     </div>
-    
+
     <!-- 创建/编辑对话框 -->
-    <el-dialog
-      v-model="dialogVisible"
-      :title="dialogTitle"
-      width="520px"
-      class="glass-dialog"
-    >
+    <el-dialog v-model="dialogVisible" :title="dialogTitle" width="520px" class="glass-dialog">
       <div class="dialog-body">
-        <el-form
-          ref="formRef"
-          :model="form"
-          :rules="formRules"
-          label-width="100px"
-        >
+        <el-form ref="formRef" :model="form" :rules="formRules" label-width="100px">
           <el-form-item label="名称" prop="name">
             <el-input v-model="form.name" placeholder="请输入知识库名称" />
           </el-form-item>
@@ -88,23 +79,19 @@
           </el-form-item>
 
           <el-form-item label="描述" prop="description">
-            <el-input
-              v-model="form.description"
-              type="textarea"
-              :rows="4"
-              placeholder="请输入知识库描述"
-            />
+            <el-input v-model="form.description" type="textarea" :rows="4" placeholder="请输入知识库描述" />
           </el-form-item>
-          
+
           <el-form-item label="嵌入模型" prop="embedding_model">
-            <el-select v-model="form.embedding_model" placeholder="请选择嵌入模型" class="full-width">
+            <el-select v-model="form.embedding_model" placeholder="请选择嵌入模型" class="full-width" :disabled="isEditing">
               <el-option label="text-embedding-ada-002" value="text-embedding-ada-002" />
               <el-option label="text-embedding-3-small" value="text-embedding-3-small" />
               <el-option label="text-embedding-3-large" value="text-embedding-3-large" />
             </el-select>
           </el-form-item>
-          
-          <div class="inline-fields">
+
+          <!-- 分块配置仅在创建时显示，编辑时隐藏（后端使用全局配置） -->
+          <div v-if="!isEditing" class="inline-fields">
             <el-form-item label="分块大小" prop="chunk_size">
               <el-input-number v-model="form.chunk_size" :min="100" :max="2000" :step="100" />
             </el-form-item>
@@ -114,7 +101,7 @@
           </div>
         </el-form>
       </div>
-      
+
       <template #footer>
         <el-button @click="dialogVisible = false">取消</el-button>
         <el-button type="primary" :loading="submitting" @click="handleSubmit">
@@ -126,7 +113,7 @@
 </template>
 
 <script setup>
-import { ref, reactive, onMounted } from 'vue'
+import { ref, reactive, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { useKnowledgeStore } from '@/stores/knowledge'
@@ -147,6 +134,9 @@ const dialogTitle = ref('创建知识库')
 const submitting = ref(false)
 const formRef = ref(null)
 const editingId = ref(null)
+
+// 是否是编辑模式
+const isEditing = computed(() => editingId.value !== null)
 
 const form = reactive({
   name: '',
@@ -216,7 +206,7 @@ const resetForm = () => {
 
 const handleSubmit = async () => {
   if (!formRef.value) return
-  
+
   await formRef.value.validate(async (valid) => {
     if (valid) {
       submitting.value = true
