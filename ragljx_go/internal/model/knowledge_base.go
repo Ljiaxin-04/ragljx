@@ -75,34 +75,3 @@ func (kd *KnowledgeDocument) BeforeCreate(tx *gorm.DB) error {
 	return nil
 }
 
-// DocumentTask 文档任务模型
-type DocumentTask struct {
-	ID           string         `gorm:"type:varchar(64);primaryKey" json:"id"`
-	DocumentID   string         `gorm:"type:varchar(64);not null;index" json:"document_id"`
-	TaskType     string         `gorm:"type:varchar(32);not null;index" json:"task_type"`
-	Status       string         `gorm:"type:varchar(32);default:'pending';index" json:"status"`
-	Priority     int            `gorm:"default:0;index:idx_task_priority,sort:desc" json:"priority"`
-	RetryCount   int            `gorm:"default:0" json:"retry_count"`
-	MaxRetries   int            `gorm:"default:3" json:"max_retries"`
-	ErrorMessage string         `gorm:"type:text" json:"error_message,omitempty"`
-	StartedAt    *time.Time     `json:"started_at"`
-	CompletedAt  *time.Time     `json:"completed_at"`
-	CreatedAt    time.Time      `json:"created_at"`
-	UpdatedAt    time.Time      `json:"updated_at"`
-	DeletedAt    gorm.DeletedAt `gorm:"index" json:"-"`
-
-	Document *KnowledgeDocument `gorm:"foreignKey:DocumentID" json:"document,omitempty"`
-}
-
-// TableName 指定表名
-func (DocumentTask) TableName() string {
-	return "document_tasks"
-}
-
-// BeforeCreate GORM hook，创建前生成 UUID
-func (dt *DocumentTask) BeforeCreate(tx *gorm.DB) error {
-	if dt.ID == "" {
-		dt.ID = generateUUID()
-	}
-	return nil
-}

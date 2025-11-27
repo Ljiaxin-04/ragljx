@@ -47,24 +47,4 @@ CREATE INDEX idx_doc_status ON knowledge_documents(parsing_status);
 CREATE INDEX idx_doc_created_by ON knowledge_documents(created_by_id);
 CREATE INDEX idx_doc_checksum ON knowledge_documents(checksum);
 
--- 文档任务表
-CREATE TABLE IF NOT EXISTS document_tasks (
-    id VARCHAR(64) PRIMARY KEY DEFAULT gen_random_uuid()::TEXT,
-    document_id VARCHAR(64) NOT NULL REFERENCES knowledge_documents(id) ON DELETE CASCADE,
-    task_type VARCHAR(32) NOT NULL,
-    status VARCHAR(32) DEFAULT 'pending',
-    priority INTEGER DEFAULT 0,
-    retry_count INTEGER DEFAULT 0,
-    max_retries INTEGER DEFAULT 3,
-    error_message TEXT,
-    started_at TIMESTAMP,
-    completed_at TIMESTAMP,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
-
-CREATE INDEX idx_task_doc_id ON document_tasks(document_id);
-CREATE INDEX idx_task_status ON document_tasks(status);
-CREATE INDEX idx_task_priority ON document_tasks(priority DESC);
-CREATE INDEX idx_task_type ON document_tasks(task_type);
 
