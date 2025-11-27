@@ -411,6 +411,104 @@ func (x *DeleteDocumentVectorsResponse) GetErrorMessage() string {
 	return ""
 }
 
+// 删除集合请求
+type DeleteCollectionRequest struct {
+	state          protoimpl.MessageState `protogen:"open.v1"`
+	CollectionName string                 `protobuf:"bytes,1,opt,name=collection_name,json=collectionName,proto3" json:"collection_name,omitempty"`
+	unknownFields  protoimpl.UnknownFields
+	sizeCache      protoimpl.SizeCache
+}
+
+func (x *DeleteCollectionRequest) Reset() {
+	*x = DeleteCollectionRequest{}
+	mi := &file_proto_rag_rag_service_proto_msgTypes[6]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *DeleteCollectionRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DeleteCollectionRequest) ProtoMessage() {}
+
+func (x *DeleteCollectionRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_rag_rag_service_proto_msgTypes[6]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DeleteCollectionRequest.ProtoReflect.Descriptor instead.
+func (*DeleteCollectionRequest) Descriptor() ([]byte, []int) {
+	return file_proto_rag_rag_service_proto_rawDescGZIP(), []int{6}
+}
+
+func (x *DeleteCollectionRequest) GetCollectionName() string {
+	if x != nil {
+		return x.CollectionName
+	}
+	return ""
+}
+
+// 删除集合响应
+type DeleteCollectionResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Success       bool                   `protobuf:"varint,1,opt,name=success,proto3" json:"success,omitempty"`
+	ErrorMessage  string                 `protobuf:"bytes,2,opt,name=error_message,json=errorMessage,proto3" json:"error_message,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *DeleteCollectionResponse) Reset() {
+	*x = DeleteCollectionResponse{}
+	mi := &file_proto_rag_rag_service_proto_msgTypes[7]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *DeleteCollectionResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DeleteCollectionResponse) ProtoMessage() {}
+
+func (x *DeleteCollectionResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_rag_rag_service_proto_msgTypes[7]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DeleteCollectionResponse.ProtoReflect.Descriptor instead.
+func (*DeleteCollectionResponse) Descriptor() ([]byte, []int) {
+	return file_proto_rag_rag_service_proto_rawDescGZIP(), []int{7}
+}
+
+func (x *DeleteCollectionResponse) GetSuccess() bool {
+	if x != nil {
+		return x.Success
+	}
+	return false
+}
+
+func (x *DeleteCollectionResponse) GetErrorMessage() string {
+	if x != nil {
+		return x.ErrorMessage
+	}
+	return ""
+}
+
 // 对话请求
 type ChatRequest struct {
 	state               protoimpl.MessageState `protogen:"open.v1"`
@@ -427,7 +525,7 @@ type ChatRequest struct {
 
 func (x *ChatRequest) Reset() {
 	*x = ChatRequest{}
-	mi := &file_proto_rag_rag_service_proto_msgTypes[6]
+	mi := &file_proto_rag_rag_service_proto_msgTypes[8]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -439,7 +537,7 @@ func (x *ChatRequest) String() string {
 func (*ChatRequest) ProtoMessage() {}
 
 func (x *ChatRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_rag_rag_service_proto_msgTypes[6]
+	mi := &file_proto_rag_rag_service_proto_msgTypes[8]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -452,7 +550,7 @@ func (x *ChatRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ChatRequest.ProtoReflect.Descriptor instead.
 func (*ChatRequest) Descriptor() ([]byte, []int) {
-	return file_proto_rag_rag_service_proto_rawDescGZIP(), []int{6}
+	return file_proto_rag_rag_service_proto_rawDescGZIP(), []int{8}
 }
 
 func (x *ChatRequest) GetQuery() string {
@@ -515,7 +613,7 @@ type ChatMessage struct {
 
 func (x *ChatMessage) Reset() {
 	*x = ChatMessage{}
-	mi := &file_proto_rag_rag_service_proto_msgTypes[7]
+	mi := &file_proto_rag_rag_service_proto_msgTypes[9]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -527,7 +625,7 @@ func (x *ChatMessage) String() string {
 func (*ChatMessage) ProtoMessage() {}
 
 func (x *ChatMessage) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_rag_rag_service_proto_msgTypes[7]
+	mi := &file_proto_rag_rag_service_proto_msgTypes[9]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -540,7 +638,7 @@ func (x *ChatMessage) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ChatMessage.ProtoReflect.Descriptor instead.
 func (*ChatMessage) Descriptor() ([]byte, []int) {
-	return file_proto_rag_rag_service_proto_rawDescGZIP(), []int{7}
+	return file_proto_rag_rag_service_proto_rawDescGZIP(), []int{9}
 }
 
 func (x *ChatMessage) GetRole() string {
@@ -569,7 +667,7 @@ type ChatResponse struct {
 
 func (x *ChatResponse) Reset() {
 	*x = ChatResponse{}
-	mi := &file_proto_rag_rag_service_proto_msgTypes[8]
+	mi := &file_proto_rag_rag_service_proto_msgTypes[10]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -581,7 +679,7 @@ func (x *ChatResponse) String() string {
 func (*ChatResponse) ProtoMessage() {}
 
 func (x *ChatResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_rag_rag_service_proto_msgTypes[8]
+	mi := &file_proto_rag_rag_service_proto_msgTypes[10]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -594,7 +692,7 @@ func (x *ChatResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ChatResponse.ProtoReflect.Descriptor instead.
 func (*ChatResponse) Descriptor() ([]byte, []int) {
-	return file_proto_rag_rag_service_proto_rawDescGZIP(), []int{8}
+	return file_proto_rag_rag_service_proto_rawDescGZIP(), []int{10}
 }
 
 func (x *ChatResponse) GetContent() string {
@@ -631,7 +729,7 @@ type ChatStreamResponse struct {
 
 func (x *ChatStreamResponse) Reset() {
 	*x = ChatStreamResponse{}
-	mi := &file_proto_rag_rag_service_proto_msgTypes[9]
+	mi := &file_proto_rag_rag_service_proto_msgTypes[11]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -643,7 +741,7 @@ func (x *ChatStreamResponse) String() string {
 func (*ChatStreamResponse) ProtoMessage() {}
 
 func (x *ChatStreamResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_rag_rag_service_proto_msgTypes[9]
+	mi := &file_proto_rag_rag_service_proto_msgTypes[11]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -656,7 +754,7 @@ func (x *ChatStreamResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ChatStreamResponse.ProtoReflect.Descriptor instead.
 func (*ChatStreamResponse) Descriptor() ([]byte, []int) {
-	return file_proto_rag_rag_service_proto_rawDescGZIP(), []int{9}
+	return file_proto_rag_rag_service_proto_rawDescGZIP(), []int{11}
 }
 
 func (x *ChatStreamResponse) GetType() string {
@@ -700,7 +798,7 @@ type RAGSource struct {
 
 func (x *RAGSource) Reset() {
 	*x = RAGSource{}
-	mi := &file_proto_rag_rag_service_proto_msgTypes[10]
+	mi := &file_proto_rag_rag_service_proto_msgTypes[12]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -712,7 +810,7 @@ func (x *RAGSource) String() string {
 func (*RAGSource) ProtoMessage() {}
 
 func (x *RAGSource) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_rag_rag_service_proto_msgTypes[10]
+	mi := &file_proto_rag_rag_service_proto_msgTypes[12]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -725,7 +823,7 @@ func (x *RAGSource) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use RAGSource.ProtoReflect.Descriptor instead.
 func (*RAGSource) Descriptor() ([]byte, []int) {
-	return file_proto_rag_rag_service_proto_rawDescGZIP(), []int{10}
+	return file_proto_rag_rag_service_proto_rawDescGZIP(), []int{12}
 }
 
 func (x *RAGSource) GetDocumentId() string {
@@ -769,7 +867,7 @@ type RetrieveDocumentsRequest struct {
 
 func (x *RetrieveDocumentsRequest) Reset() {
 	*x = RetrieveDocumentsRequest{}
-	mi := &file_proto_rag_rag_service_proto_msgTypes[11]
+	mi := &file_proto_rag_rag_service_proto_msgTypes[13]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -781,7 +879,7 @@ func (x *RetrieveDocumentsRequest) String() string {
 func (*RetrieveDocumentsRequest) ProtoMessage() {}
 
 func (x *RetrieveDocumentsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_rag_rag_service_proto_msgTypes[11]
+	mi := &file_proto_rag_rag_service_proto_msgTypes[13]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -794,7 +892,7 @@ func (x *RetrieveDocumentsRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use RetrieveDocumentsRequest.ProtoReflect.Descriptor instead.
 func (*RetrieveDocumentsRequest) Descriptor() ([]byte, []int) {
-	return file_proto_rag_rag_service_proto_rawDescGZIP(), []int{11}
+	return file_proto_rag_rag_service_proto_rawDescGZIP(), []int{13}
 }
 
 func (x *RetrieveDocumentsRequest) GetQuery() string {
@@ -835,7 +933,7 @@ type RetrieveDocumentsResponse struct {
 
 func (x *RetrieveDocumentsResponse) Reset() {
 	*x = RetrieveDocumentsResponse{}
-	mi := &file_proto_rag_rag_service_proto_msgTypes[12]
+	mi := &file_proto_rag_rag_service_proto_msgTypes[14]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -847,7 +945,7 @@ func (x *RetrieveDocumentsResponse) String() string {
 func (*RetrieveDocumentsResponse) ProtoMessage() {}
 
 func (x *RetrieveDocumentsResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_rag_rag_service_proto_msgTypes[12]
+	mi := &file_proto_rag_rag_service_proto_msgTypes[14]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -860,7 +958,7 @@ func (x *RetrieveDocumentsResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use RetrieveDocumentsResponse.ProtoReflect.Descriptor instead.
 func (*RetrieveDocumentsResponse) Descriptor() ([]byte, []int) {
-	return file_proto_rag_rag_service_proto_rawDescGZIP(), []int{12}
+	return file_proto_rag_rag_service_proto_rawDescGZIP(), []int{14}
 }
 
 func (x *RetrieveDocumentsResponse) GetDocuments() []*RAGSource {
@@ -906,7 +1004,12 @@ const file_proto_rag_rag_service_proto_rawDesc = "" +
 	"\x1dDeleteDocumentVectorsResponse\x12\x18\n" +
 	"\asuccess\x18\x01 \x01(\bR\asuccess\x12#\n" +
 	"\rdeleted_count\x18\x02 \x01(\x05R\fdeletedCount\x12#\n" +
-	"\rerror_message\x18\x03 \x01(\tR\ferrorMessage\"\x8b\x02\n" +
+	"\rerror_message\x18\x03 \x01(\tR\ferrorMessage\"B\n" +
+	"\x17DeleteCollectionRequest\x12'\n" +
+	"\x0fcollection_name\x18\x01 \x01(\tR\x0ecollectionName\"Y\n" +
+	"\x18DeleteCollectionResponse\x12\x18\n" +
+	"\asuccess\x18\x01 \x01(\bR\asuccess\x12#\n" +
+	"\rerror_message\x18\x02 \x01(\tR\ferrorMessage\"\x8b\x02\n" +
 	"\vChatRequest\x12\x14\n" +
 	"\x05query\x18\x01 \x01(\tR\x05query\x12\x17\n" +
 	"\ause_rag\x18\x02 \x01(\bR\x06useRag\x12,\n" +
@@ -941,12 +1044,13 @@ const file_proto_rag_rag_service_proto_rawDesc = "" +
 	"\x05top_k\x18\x03 \x01(\x05R\x04topK\x121\n" +
 	"\x14similarity_threshold\x18\x04 \x01(\x02R\x13similarityThreshold\"I\n" +
 	"\x19RetrieveDocumentsResponse\x12,\n" +
-	"\tdocuments\x18\x01 \x03(\v2\x0e.rag.RAGSourceR\tdocuments2\xc4\x03\n" +
+	"\tdocuments\x18\x01 \x03(\v2\x0e.rag.RAGSourceR\tdocuments2\x95\x04\n" +
 	"\n" +
 	"RAGService\x12F\n" +
 	"\rParseDocument\x12\x19.rag.ParseDocumentRequest\x1a\x1a.rag.ParseDocumentResponse\x12R\n" +
 	"\x11VectorizeDocument\x12\x1d.rag.VectorizeDocumentRequest\x1a\x1e.rag.VectorizeDocumentResponse\x12^\n" +
-	"\x15DeleteDocumentVectors\x12!.rag.DeleteDocumentVectorsRequest\x1a\".rag.DeleteDocumentVectorsResponse\x12+\n" +
+	"\x15DeleteDocumentVectors\x12!.rag.DeleteDocumentVectorsRequest\x1a\".rag.DeleteDocumentVectorsResponse\x12O\n" +
+	"\x10DeleteCollection\x12\x1c.rag.DeleteCollectionRequest\x1a\x1d.rag.DeleteCollectionResponse\x12+\n" +
 	"\x04Chat\x12\x10.rag.ChatRequest\x1a\x11.rag.ChatResponse\x129\n" +
 	"\n" +
 	"ChatStream\x12\x10.rag.ChatRequest\x1a\x17.rag.ChatStreamResponse0\x01\x12R\n" +
@@ -964,7 +1068,7 @@ func file_proto_rag_rag_service_proto_rawDescGZIP() []byte {
 	return file_proto_rag_rag_service_proto_rawDescData
 }
 
-var file_proto_rag_rag_service_proto_msgTypes = make([]protoimpl.MessageInfo, 13)
+var file_proto_rag_rag_service_proto_msgTypes = make([]protoimpl.MessageInfo, 15)
 var file_proto_rag_rag_service_proto_goTypes = []any{
 	(*ParseDocumentRequest)(nil),          // 0: rag.ParseDocumentRequest
 	(*ParseDocumentResponse)(nil),         // 1: rag.ParseDocumentResponse
@@ -972,33 +1076,37 @@ var file_proto_rag_rag_service_proto_goTypes = []any{
 	(*VectorizeDocumentResponse)(nil),     // 3: rag.VectorizeDocumentResponse
 	(*DeleteDocumentVectorsRequest)(nil),  // 4: rag.DeleteDocumentVectorsRequest
 	(*DeleteDocumentVectorsResponse)(nil), // 5: rag.DeleteDocumentVectorsResponse
-	(*ChatRequest)(nil),                   // 6: rag.ChatRequest
-	(*ChatMessage)(nil),                   // 7: rag.ChatMessage
-	(*ChatResponse)(nil),                  // 8: rag.ChatResponse
-	(*ChatStreamResponse)(nil),            // 9: rag.ChatStreamResponse
-	(*RAGSource)(nil),                     // 10: rag.RAGSource
-	(*RetrieveDocumentsRequest)(nil),      // 11: rag.RetrieveDocumentsRequest
-	(*RetrieveDocumentsResponse)(nil),     // 12: rag.RetrieveDocumentsResponse
+	(*DeleteCollectionRequest)(nil),       // 6: rag.DeleteCollectionRequest
+	(*DeleteCollectionResponse)(nil),      // 7: rag.DeleteCollectionResponse
+	(*ChatRequest)(nil),                   // 8: rag.ChatRequest
+	(*ChatMessage)(nil),                   // 9: rag.ChatMessage
+	(*ChatResponse)(nil),                  // 10: rag.ChatResponse
+	(*ChatStreamResponse)(nil),            // 11: rag.ChatStreamResponse
+	(*RAGSource)(nil),                     // 12: rag.RAGSource
+	(*RetrieveDocumentsRequest)(nil),      // 13: rag.RetrieveDocumentsRequest
+	(*RetrieveDocumentsResponse)(nil),     // 14: rag.RetrieveDocumentsResponse
 }
 var file_proto_rag_rag_service_proto_depIdxs = []int32{
-	7,  // 0: rag.ChatRequest.history:type_name -> rag.ChatMessage
-	10, // 1: rag.ChatResponse.sources:type_name -> rag.RAGSource
-	10, // 2: rag.ChatStreamResponse.sources:type_name -> rag.RAGSource
-	10, // 3: rag.RetrieveDocumentsResponse.documents:type_name -> rag.RAGSource
+	9,  // 0: rag.ChatRequest.history:type_name -> rag.ChatMessage
+	12, // 1: rag.ChatResponse.sources:type_name -> rag.RAGSource
+	12, // 2: rag.ChatStreamResponse.sources:type_name -> rag.RAGSource
+	12, // 3: rag.RetrieveDocumentsResponse.documents:type_name -> rag.RAGSource
 	0,  // 4: rag.RAGService.ParseDocument:input_type -> rag.ParseDocumentRequest
 	2,  // 5: rag.RAGService.VectorizeDocument:input_type -> rag.VectorizeDocumentRequest
 	4,  // 6: rag.RAGService.DeleteDocumentVectors:input_type -> rag.DeleteDocumentVectorsRequest
-	6,  // 7: rag.RAGService.Chat:input_type -> rag.ChatRequest
-	6,  // 8: rag.RAGService.ChatStream:input_type -> rag.ChatRequest
-	11, // 9: rag.RAGService.RetrieveDocuments:input_type -> rag.RetrieveDocumentsRequest
-	1,  // 10: rag.RAGService.ParseDocument:output_type -> rag.ParseDocumentResponse
-	3,  // 11: rag.RAGService.VectorizeDocument:output_type -> rag.VectorizeDocumentResponse
-	5,  // 12: rag.RAGService.DeleteDocumentVectors:output_type -> rag.DeleteDocumentVectorsResponse
-	8,  // 13: rag.RAGService.Chat:output_type -> rag.ChatResponse
-	9,  // 14: rag.RAGService.ChatStream:output_type -> rag.ChatStreamResponse
-	12, // 15: rag.RAGService.RetrieveDocuments:output_type -> rag.RetrieveDocumentsResponse
-	10, // [10:16] is the sub-list for method output_type
-	4,  // [4:10] is the sub-list for method input_type
+	6,  // 7: rag.RAGService.DeleteCollection:input_type -> rag.DeleteCollectionRequest
+	8,  // 8: rag.RAGService.Chat:input_type -> rag.ChatRequest
+	8,  // 9: rag.RAGService.ChatStream:input_type -> rag.ChatRequest
+	13, // 10: rag.RAGService.RetrieveDocuments:input_type -> rag.RetrieveDocumentsRequest
+	1,  // 11: rag.RAGService.ParseDocument:output_type -> rag.ParseDocumentResponse
+	3,  // 12: rag.RAGService.VectorizeDocument:output_type -> rag.VectorizeDocumentResponse
+	5,  // 13: rag.RAGService.DeleteDocumentVectors:output_type -> rag.DeleteDocumentVectorsResponse
+	7,  // 14: rag.RAGService.DeleteCollection:output_type -> rag.DeleteCollectionResponse
+	10, // 15: rag.RAGService.Chat:output_type -> rag.ChatResponse
+	11, // 16: rag.RAGService.ChatStream:output_type -> rag.ChatStreamResponse
+	14, // 17: rag.RAGService.RetrieveDocuments:output_type -> rag.RetrieveDocumentsResponse
+	11, // [11:18] is the sub-list for method output_type
+	4,  // [4:11] is the sub-list for method input_type
 	4,  // [4:4] is the sub-list for extension type_name
 	4,  // [4:4] is the sub-list for extension extendee
 	0,  // [0:4] is the sub-list for field type_name
@@ -1015,7 +1123,7 @@ func file_proto_rag_rag_service_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_proto_rag_rag_service_proto_rawDesc), len(file_proto_rag_rag_service_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   13,
+			NumMessages:   15,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

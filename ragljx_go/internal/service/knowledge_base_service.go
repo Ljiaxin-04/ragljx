@@ -138,11 +138,17 @@ func (s *KnowledgeBaseService) Delete(ctx context.Context, id string) error {
 		return errors.New(400, "knowledge base has documents, please delete them first")
 	}
 
-	// 删除 Qdrant collection（如果 gRPC 客户端可用且 english_name 不为空）
+	// 删除 Qdrant collection
 	if s.grpcClient != nil && kb.EnglishName != "" {
-		// 注意：这里需要添加一个新的 gRPC 方法来删除 collection
-		// 暂时跳过，因为 proto 中可能没有定义这个方法
-		// 可以在 Python 端添加 DeleteCollection 方法
+		deleteResp, err := s.grpcClient.DeleteCollection(ctx, &pb.DeleteCollectionRequest{
+			CollectionName: kb.EnglishName,
+		})
+		if err != nil {
+			// 记录错误但不中断删除流程，因为集合可能不存在
+			// 可以在日志中记录
+		} else if deleteResp != nil && !deleteResp.Success {
+			// 删除失败但不中断流程
+		}
 	}
 
 	// 删除知识库记录

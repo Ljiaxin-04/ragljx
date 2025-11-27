@@ -3,7 +3,7 @@
 import grpc
 import warnings
 
-from app.proto import rag_service_pb2 as app_dot_proto_dot_rag__service__pb2
+from app.proto import rag_service_pb2 as rag__service__pb2
 
 GRPC_GENERATED_VERSION = '1.76.0'
 GRPC_VERSION = grpc.__version__
@@ -18,7 +18,7 @@ except ImportError:
 if _version_not_supported:
     raise RuntimeError(
         f'The grpc package installed is at version {GRPC_VERSION},'
-        + ' but the generated code in app/proto/rag_service_pb2_grpc.py depends on'
+        + ' but the generated code in rag_service_pb2_grpc.py depends on'
         + f' grpcio>={GRPC_GENERATED_VERSION}.'
         + f' Please upgrade your grpc module to grpcio>={GRPC_GENERATED_VERSION}'
         + f' or downgrade your generated code using grpcio-tools<={GRPC_VERSION}.'
@@ -37,33 +37,38 @@ class RAGServiceStub(object):
         """
         self.ParseDocument = channel.unary_unary(
                 '/rag.RAGService/ParseDocument',
-                request_serializer=app_dot_proto_dot_rag__service__pb2.ParseDocumentRequest.SerializeToString,
-                response_deserializer=app_dot_proto_dot_rag__service__pb2.ParseDocumentResponse.FromString,
+                request_serializer=rag__service__pb2.ParseDocumentRequest.SerializeToString,
+                response_deserializer=rag__service__pb2.ParseDocumentResponse.FromString,
                 _registered_method=True)
         self.VectorizeDocument = channel.unary_unary(
                 '/rag.RAGService/VectorizeDocument',
-                request_serializer=app_dot_proto_dot_rag__service__pb2.VectorizeDocumentRequest.SerializeToString,
-                response_deserializer=app_dot_proto_dot_rag__service__pb2.VectorizeDocumentResponse.FromString,
+                request_serializer=rag__service__pb2.VectorizeDocumentRequest.SerializeToString,
+                response_deserializer=rag__service__pb2.VectorizeDocumentResponse.FromString,
                 _registered_method=True)
         self.DeleteDocumentVectors = channel.unary_unary(
                 '/rag.RAGService/DeleteDocumentVectors',
-                request_serializer=app_dot_proto_dot_rag__service__pb2.DeleteDocumentVectorsRequest.SerializeToString,
-                response_deserializer=app_dot_proto_dot_rag__service__pb2.DeleteDocumentVectorsResponse.FromString,
+                request_serializer=rag__service__pb2.DeleteDocumentVectorsRequest.SerializeToString,
+                response_deserializer=rag__service__pb2.DeleteDocumentVectorsResponse.FromString,
+                _registered_method=True)
+        self.DeleteCollection = channel.unary_unary(
+                '/rag.RAGService/DeleteCollection',
+                request_serializer=rag__service__pb2.DeleteCollectionRequest.SerializeToString,
+                response_deserializer=rag__service__pb2.DeleteCollectionResponse.FromString,
                 _registered_method=True)
         self.Chat = channel.unary_unary(
                 '/rag.RAGService/Chat',
-                request_serializer=app_dot_proto_dot_rag__service__pb2.ChatRequest.SerializeToString,
-                response_deserializer=app_dot_proto_dot_rag__service__pb2.ChatResponse.FromString,
+                request_serializer=rag__service__pb2.ChatRequest.SerializeToString,
+                response_deserializer=rag__service__pb2.ChatResponse.FromString,
                 _registered_method=True)
         self.ChatStream = channel.unary_stream(
                 '/rag.RAGService/ChatStream',
-                request_serializer=app_dot_proto_dot_rag__service__pb2.ChatRequest.SerializeToString,
-                response_deserializer=app_dot_proto_dot_rag__service__pb2.ChatStreamResponse.FromString,
+                request_serializer=rag__service__pb2.ChatRequest.SerializeToString,
+                response_deserializer=rag__service__pb2.ChatStreamResponse.FromString,
                 _registered_method=True)
         self.RetrieveDocuments = channel.unary_unary(
                 '/rag.RAGService/RetrieveDocuments',
-                request_serializer=app_dot_proto_dot_rag__service__pb2.RetrieveDocumentsRequest.SerializeToString,
-                response_deserializer=app_dot_proto_dot_rag__service__pb2.RetrieveDocumentsResponse.FromString,
+                request_serializer=rag__service__pb2.RetrieveDocumentsRequest.SerializeToString,
+                response_deserializer=rag__service__pb2.RetrieveDocumentsResponse.FromString,
                 _registered_method=True)
 
 
@@ -87,6 +92,13 @@ class RAGServiceServicer(object):
 
     def DeleteDocumentVectors(self, request, context):
         """删除文档向量
+        """
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def DeleteCollection(self, request, context):
+        """删除集合
         """
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
@@ -118,33 +130,38 @@ def add_RAGServiceServicer_to_server(servicer, server):
     rpc_method_handlers = {
             'ParseDocument': grpc.unary_unary_rpc_method_handler(
                     servicer.ParseDocument,
-                    request_deserializer=app_dot_proto_dot_rag__service__pb2.ParseDocumentRequest.FromString,
-                    response_serializer=app_dot_proto_dot_rag__service__pb2.ParseDocumentResponse.SerializeToString,
+                    request_deserializer=rag__service__pb2.ParseDocumentRequest.FromString,
+                    response_serializer=rag__service__pb2.ParseDocumentResponse.SerializeToString,
             ),
             'VectorizeDocument': grpc.unary_unary_rpc_method_handler(
                     servicer.VectorizeDocument,
-                    request_deserializer=app_dot_proto_dot_rag__service__pb2.VectorizeDocumentRequest.FromString,
-                    response_serializer=app_dot_proto_dot_rag__service__pb2.VectorizeDocumentResponse.SerializeToString,
+                    request_deserializer=rag__service__pb2.VectorizeDocumentRequest.FromString,
+                    response_serializer=rag__service__pb2.VectorizeDocumentResponse.SerializeToString,
             ),
             'DeleteDocumentVectors': grpc.unary_unary_rpc_method_handler(
                     servicer.DeleteDocumentVectors,
-                    request_deserializer=app_dot_proto_dot_rag__service__pb2.DeleteDocumentVectorsRequest.FromString,
-                    response_serializer=app_dot_proto_dot_rag__service__pb2.DeleteDocumentVectorsResponse.SerializeToString,
+                    request_deserializer=rag__service__pb2.DeleteDocumentVectorsRequest.FromString,
+                    response_serializer=rag__service__pb2.DeleteDocumentVectorsResponse.SerializeToString,
+            ),
+            'DeleteCollection': grpc.unary_unary_rpc_method_handler(
+                    servicer.DeleteCollection,
+                    request_deserializer=rag__service__pb2.DeleteCollectionRequest.FromString,
+                    response_serializer=rag__service__pb2.DeleteCollectionResponse.SerializeToString,
             ),
             'Chat': grpc.unary_unary_rpc_method_handler(
                     servicer.Chat,
-                    request_deserializer=app_dot_proto_dot_rag__service__pb2.ChatRequest.FromString,
-                    response_serializer=app_dot_proto_dot_rag__service__pb2.ChatResponse.SerializeToString,
+                    request_deserializer=rag__service__pb2.ChatRequest.FromString,
+                    response_serializer=rag__service__pb2.ChatResponse.SerializeToString,
             ),
             'ChatStream': grpc.unary_stream_rpc_method_handler(
                     servicer.ChatStream,
-                    request_deserializer=app_dot_proto_dot_rag__service__pb2.ChatRequest.FromString,
-                    response_serializer=app_dot_proto_dot_rag__service__pb2.ChatStreamResponse.SerializeToString,
+                    request_deserializer=rag__service__pb2.ChatRequest.FromString,
+                    response_serializer=rag__service__pb2.ChatStreamResponse.SerializeToString,
             ),
             'RetrieveDocuments': grpc.unary_unary_rpc_method_handler(
                     servicer.RetrieveDocuments,
-                    request_deserializer=app_dot_proto_dot_rag__service__pb2.RetrieveDocumentsRequest.FromString,
-                    response_serializer=app_dot_proto_dot_rag__service__pb2.RetrieveDocumentsResponse.SerializeToString,
+                    request_deserializer=rag__service__pb2.RetrieveDocumentsRequest.FromString,
+                    response_serializer=rag__service__pb2.RetrieveDocumentsResponse.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
@@ -173,8 +190,8 @@ class RAGService(object):
             request,
             target,
             '/rag.RAGService/ParseDocument',
-            app_dot_proto_dot_rag__service__pb2.ParseDocumentRequest.SerializeToString,
-            app_dot_proto_dot_rag__service__pb2.ParseDocumentResponse.FromString,
+            rag__service__pb2.ParseDocumentRequest.SerializeToString,
+            rag__service__pb2.ParseDocumentResponse.FromString,
             options,
             channel_credentials,
             insecure,
@@ -200,8 +217,8 @@ class RAGService(object):
             request,
             target,
             '/rag.RAGService/VectorizeDocument',
-            app_dot_proto_dot_rag__service__pb2.VectorizeDocumentRequest.SerializeToString,
-            app_dot_proto_dot_rag__service__pb2.VectorizeDocumentResponse.FromString,
+            rag__service__pb2.VectorizeDocumentRequest.SerializeToString,
+            rag__service__pb2.VectorizeDocumentResponse.FromString,
             options,
             channel_credentials,
             insecure,
@@ -227,8 +244,35 @@ class RAGService(object):
             request,
             target,
             '/rag.RAGService/DeleteDocumentVectors',
-            app_dot_proto_dot_rag__service__pb2.DeleteDocumentVectorsRequest.SerializeToString,
-            app_dot_proto_dot_rag__service__pb2.DeleteDocumentVectorsResponse.FromString,
+            rag__service__pb2.DeleteDocumentVectorsRequest.SerializeToString,
+            rag__service__pb2.DeleteDocumentVectorsResponse.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
+
+    @staticmethod
+    def DeleteCollection(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            '/rag.RAGService/DeleteCollection',
+            rag__service__pb2.DeleteCollectionRequest.SerializeToString,
+            rag__service__pb2.DeleteCollectionResponse.FromString,
             options,
             channel_credentials,
             insecure,
@@ -254,8 +298,8 @@ class RAGService(object):
             request,
             target,
             '/rag.RAGService/Chat',
-            app_dot_proto_dot_rag__service__pb2.ChatRequest.SerializeToString,
-            app_dot_proto_dot_rag__service__pb2.ChatResponse.FromString,
+            rag__service__pb2.ChatRequest.SerializeToString,
+            rag__service__pb2.ChatResponse.FromString,
             options,
             channel_credentials,
             insecure,
@@ -281,8 +325,8 @@ class RAGService(object):
             request,
             target,
             '/rag.RAGService/ChatStream',
-            app_dot_proto_dot_rag__service__pb2.ChatRequest.SerializeToString,
-            app_dot_proto_dot_rag__service__pb2.ChatStreamResponse.FromString,
+            rag__service__pb2.ChatRequest.SerializeToString,
+            rag__service__pb2.ChatStreamResponse.FromString,
             options,
             channel_credentials,
             insecure,
@@ -308,8 +352,8 @@ class RAGService(object):
             request,
             target,
             '/rag.RAGService/RetrieveDocuments',
-            app_dot_proto_dot_rag__service__pb2.RetrieveDocumentsRequest.SerializeToString,
-            app_dot_proto_dot_rag__service__pb2.RetrieveDocumentsResponse.FromString,
+            rag__service__pb2.RetrieveDocumentsRequest.SerializeToString,
+            rag__service__pb2.RetrieveDocumentsResponse.FromString,
             options,
             channel_credentials,
             insecure,

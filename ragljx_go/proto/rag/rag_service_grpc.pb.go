@@ -22,6 +22,7 @@ const (
 	RAGService_ParseDocument_FullMethodName         = "/rag.RAGService/ParseDocument"
 	RAGService_VectorizeDocument_FullMethodName     = "/rag.RAGService/VectorizeDocument"
 	RAGService_DeleteDocumentVectors_FullMethodName = "/rag.RAGService/DeleteDocumentVectors"
+	RAGService_DeleteCollection_FullMethodName      = "/rag.RAGService/DeleteCollection"
 	RAGService_Chat_FullMethodName                  = "/rag.RAGService/Chat"
 	RAGService_ChatStream_FullMethodName            = "/rag.RAGService/ChatStream"
 	RAGService_RetrieveDocuments_FullMethodName     = "/rag.RAGService/RetrieveDocuments"
@@ -39,6 +40,8 @@ type RAGServiceClient interface {
 	VectorizeDocument(ctx context.Context, in *VectorizeDocumentRequest, opts ...grpc.CallOption) (*VectorizeDocumentResponse, error)
 	// 删除文档向量
 	DeleteDocumentVectors(ctx context.Context, in *DeleteDocumentVectorsRequest, opts ...grpc.CallOption) (*DeleteDocumentVectorsResponse, error)
+	// 删除集合
+	DeleteCollection(ctx context.Context, in *DeleteCollectionRequest, opts ...grpc.CallOption) (*DeleteCollectionResponse, error)
 	// RAG 对话
 	Chat(ctx context.Context, in *ChatRequest, opts ...grpc.CallOption) (*ChatResponse, error)
 	// RAG 对话（流式）
@@ -79,6 +82,16 @@ func (c *rAGServiceClient) DeleteDocumentVectors(ctx context.Context, in *Delete
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(DeleteDocumentVectorsResponse)
 	err := c.cc.Invoke(ctx, RAGService_DeleteDocumentVectors_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *rAGServiceClient) DeleteCollection(ctx context.Context, in *DeleteCollectionRequest, opts ...grpc.CallOption) (*DeleteCollectionResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(DeleteCollectionResponse)
+	err := c.cc.Invoke(ctx, RAGService_DeleteCollection_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -136,6 +149,8 @@ type RAGServiceServer interface {
 	VectorizeDocument(context.Context, *VectorizeDocumentRequest) (*VectorizeDocumentResponse, error)
 	// 删除文档向量
 	DeleteDocumentVectors(context.Context, *DeleteDocumentVectorsRequest) (*DeleteDocumentVectorsResponse, error)
+	// 删除集合
+	DeleteCollection(context.Context, *DeleteCollectionRequest) (*DeleteCollectionResponse, error)
 	// RAG 对话
 	Chat(context.Context, *ChatRequest) (*ChatResponse, error)
 	// RAG 对话（流式）
@@ -160,6 +175,9 @@ func (UnimplementedRAGServiceServer) VectorizeDocument(context.Context, *Vectori
 }
 func (UnimplementedRAGServiceServer) DeleteDocumentVectors(context.Context, *DeleteDocumentVectorsRequest) (*DeleteDocumentVectorsResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeleteDocumentVectors not implemented")
+}
+func (UnimplementedRAGServiceServer) DeleteCollection(context.Context, *DeleteCollectionRequest) (*DeleteCollectionResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DeleteCollection not implemented")
 }
 func (UnimplementedRAGServiceServer) Chat(context.Context, *ChatRequest) (*ChatResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Chat not implemented")
@@ -245,6 +263,24 @@ func _RAGService_DeleteDocumentVectors_Handler(srv interface{}, ctx context.Cont
 	return interceptor(ctx, in, info, handler)
 }
 
+func _RAGService_DeleteCollection_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DeleteCollectionRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(RAGServiceServer).DeleteCollection(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: RAGService_DeleteCollection_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(RAGServiceServer).DeleteCollection(ctx, req.(*DeleteCollectionRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _RAGService_Chat_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(ChatRequest)
 	if err := dec(in); err != nil {
@@ -310,6 +346,10 @@ var RAGService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "DeleteDocumentVectors",
 			Handler:    _RAGService_DeleteDocumentVectors_Handler,
+		},
+		{
+			MethodName: "DeleteCollection",
+			Handler:    _RAGService_DeleteCollection_Handler,
 		},
 		{
 			MethodName: "Chat",

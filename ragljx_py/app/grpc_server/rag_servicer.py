@@ -86,23 +86,48 @@ class RAGServicer(rag_service_pb2_grpc.RAGServiceServicer):
         """删除文档向量"""
         try:
             logger.info(f"Deleting vectors for documents: {request.document_ids} from collection: {request.collection_name}")
-            
+
             deleted_count = 0
             for document_id in request.document_ids:
                 if self.vector_service.delete_document(request.collection_name, document_id):
                     deleted_count += 1
-            
+
             return rag_service_pb2.DeleteDocumentVectorsResponse(
                 success=True,
                 deleted_count=deleted_count,
                 error_message=""
             )
-        
+
         except Exception as e:
             logger.error(f"Error deleting document vectors: {e}")
             return rag_service_pb2.DeleteDocumentVectorsResponse(
                 success=False,
                 deleted_count=0,
+                error_message=str(e)
+            )
+
+    def DeleteCollection(self, request, context):
+        """删除集合"""
+        try:
+            logger.info(f"Deleting collection: {request.collection_name}")
+
+            success = self.vector_service.delete_collection(request.collection_name)
+
+            if success:
+                return rag_service_pb2.DeleteCollectionResponse(
+                    success=True,
+                    error_message=""
+                )
+            else:
+                return rag_service_pb2.DeleteCollectionResponse(
+                    success=False,
+                    error_message="Failed to delete collection"
+                )
+
+        except Exception as e:
+            logger.error(f"Error deleting collection: {e}")
+            return rag_service_pb2.DeleteCollectionResponse(
+                success=False,
                 error_message=str(e)
             )
     
