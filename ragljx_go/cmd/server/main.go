@@ -8,11 +8,12 @@ import (
 	"os/signal"
 	"ragljx/ioc"
 	"ragljx/ioc/config/datasource"
+	grpcConfig "ragljx/ioc/config/grpc"
 	httpConfig "ragljx/ioc/config/http"
+	jwtConfig "ragljx/ioc/config/jwt"
 	kafkaConfig "ragljx/ioc/config/kafka"
 	minioConfig "ragljx/ioc/config/minio"
 	redisConfig "ragljx/ioc/config/redis"
-	grpcConfig "ragljx/ioc/config/grpc"
 	"syscall"
 	"time"
 
@@ -43,6 +44,7 @@ func main() {
 	_ = kafkaConfig.Get()
 	_ = minioConfig.Get()
 	_ = grpcConfig.Get()
+	_ = jwtConfig.Get()
 
 	// 获取 HTTP 服务
 	httpServer := httpConfig.Get()
@@ -78,4 +80,3 @@ func main() {
 
 	log.Println("Server exited")
 }
-
