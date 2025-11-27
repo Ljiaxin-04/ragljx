@@ -58,3 +58,8 @@ log:
   output: "stdout"
   format: "json"
 
+# 时区配置
+timezone:
+  # 推荐值：Asia/Shanghai（中国大陆）、Asia/Hong_Kong、Asia/Taipei、Asia/Tokyo、UTC
+  # 全量列表可参考 IANA time zone database
+  location: "Asia/Shanghai"

@@ -470,16 +470,15 @@ const formatMessage = (content) => {
 const formatDateTime = (dateString) => {
   if (!dateString) return ''
 
-  // 如果时间字符串没有时区信息，假设后端返回的是 UTC 时间，添加 'Z' 后缀
-  let normalizedDateString = dateString
-  if (!dateString.endsWith('Z') && !dateString.includes('+') && !dateString.includes('-', 10)) {
-    normalizedDateString = dateString + 'Z'
-  }
+  // 统一按本地时间解析，去掉尾部时区标记，避免重复 +8
+  const stripped = dateString
+    .replace(' ', 'T')
+    .replace(/([+-]\d{2}:?\d{2}|[zZ])$/, '')
 
-  const date = new Date(normalizedDateString)
+  const date = new Date(stripped)
   if (isNaN(date.getTime())) return ''
 
-  // 统一显示为 UTC+8（北京时间）
+  // 统一显示为 UTC+8（北京时间），无论浏览器本地时区
   return date.toLocaleString('zh-CN', {
     hour12: false,
     timeZone: 'Asia/Shanghai'
