@@ -242,7 +242,18 @@ const handleDelete = (kb) => {
       fetchKnowledgeBases()
     } catch (error) {
       console.error('Delete failed:', error)
-      ElMessage.error('删除失败')
+      // 提取后端返回的错误信息
+      let errorMsg = '删除失败'
+      if (error.response?.data?.message) {
+        const msg = error.response.data.message
+        // 处理常见错误信息的中文化
+        if (msg.includes('has documents')) {
+          errorMsg = '该知识库下还有文档，请先删除所有文档'
+        } else {
+          errorMsg = msg
+        }
+      }
+      ElMessage.error(errorMsg)
     }
   }).catch(() => {
     // 取消操作
